@@ -1,0 +1,1532 @@
+<!DOCTYPE html>
+<!-- saved from url=(0037)https://hmz-cloud.github.io/FleetOps/ -->
+<html lang="en"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Fleet Ops — Operations Platform</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600&family=DM+Mono:wght@400;500&display=swap');
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#0b0d14;--bg2:#12151f;--bg3:#181c29;--bg4:#1f2335;--bg5:#252a3d;
+  --border:#252a3d;--border2:#313757;--border3:#3d4468;
+  --text:#e2e5f3;--text2:#8b92b8;--text3:#555e84;--text4:#363d5c;
+  --accent:#4f8ef7;--accent2:#7aaeff;--accent-bg:rgba(79,142,247,0.1);--accent-border:rgba(79,142,247,0.3);
+  --green:#2ecc71;--green2:#27ae60;--green-bg:rgba(46,204,113,0.1);--green-border:rgba(46,204,113,0.3);
+  --amber:#f39c12;--amber2:#e67e22;--amber-bg:rgba(243,156,18,0.1);--amber-border:rgba(243,156,18,0.3);
+  --red:#e74c3c;--red2:#c0392b;--red-bg:rgba(231,76,60,0.1);--red-border:rgba(231,76,60,0.3);
+  --purple:#9b59b6;--purple2:#8e44ad;--purple-bg:rgba(155,89,182,0.1);--purple-border:rgba(155,89,182,0.3);
+  --teal:#1abc9c;--teal-bg:rgba(26,188,156,0.1);
+  --sidebar:240px;--topbar:58px;
+  --r:10px;--rs:6px;--rl:14px;
+  font-family:'DM Sans',sans-serif;font-size:14px;
+}
+body{background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden}
+button,input,select,textarea{font-family:inherit;outline:none;border:none}
+button{cursor:pointer}
+a{color:inherit;text-decoration:none}
+
+/* ── LAYOUT ── */
+.app{display:flex;min-height:100vh}
+.sidebar{width:var(--sidebar);background:var(--bg2);border-right:1px solid var(--border);display:flex;flex-direction:column;position:fixed;inset:0 auto 0 0;z-index:100;transition:transform .25s}
+.main{margin-left:var(--sidebar);flex:1;display:flex;flex-direction:column}
+.topbar{height:var(--topbar);background:var(--bg2);border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;padding:0 24px;position:sticky;top:0;z-index:90;gap:16px}
+.content{flex:1;padding:24px;min-height:calc(100vh - var(--topbar))}
+
+/* ── SIDEBAR ── */
+.logo{padding:18px 16px;display:flex;align-items:center;gap:12px;border-bottom:1px solid var(--border)}
+.logo-mark{width:34px;height:34px;background:linear-gradient(135deg,#4f8ef7,#7b5ea7);border-radius:9px;display:flex;align-items:center;justify-content:center;flex-shrink:0;box-shadow:0 4px 12px rgba(79,142,247,0.3)}
+.logo-mark svg{width:18px;height:18px;fill:white}
+.logo-name{font-size:15px;font-weight:600;letter-spacing:-.3px}
+.logo-name span{color:var(--accent2)}
+.logo-ver{font-size:10px;color:var(--text3);font-family:'DM Mono',monospace}
+.nav{padding:10px 8px;flex:1;overflow-y:auto}
+.nav-section{font-size:10px;font-weight:500;text-transform:uppercase;letter-spacing:1px;color:var(--text3);padding:10px 10px 4px;margin-top:4px}
+.nav-item{display:flex;align-items:center;gap:10px;padding:9px 12px;border-radius:var(--rs);cursor:pointer;font-size:13px;font-weight:400;color:var(--text2);transition:all .15s;margin-bottom:1px;position:relative}
+.nav-item:hover{background:var(--bg3);color:var(--text)}
+.nav-item.active{background:var(--accent-bg);color:var(--accent2);font-weight:500;border:1px solid var(--accent-border)}
+.nav-item svg{width:15px;height:15px;flex-shrink:0}
+.nav-badge{margin-left:auto;background:var(--red);color:white;font-size:10px;font-weight:600;padding:1px 6px;border-radius:100px;min-width:18px;text-align:center}
+.nav-badge.amber{background:var(--amber)}
+.sidebar-bottom{padding:12px 8px;border-top:1px solid var(--border)}
+.user-card{display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:var(--rs);background:var(--bg3);border:1px solid var(--border)}
+.avatar{width:32px;height:32px;background:linear-gradient(135deg,var(--accent),var(--purple));border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:600;color:white;flex-shrink:0}
+.user-name{font-size:12.5px;font-weight:500}
+.user-role{font-size:11px;color:var(--text3)}
+
+/* ── TOPBAR ── */
+.page-info{}
+.page-title{font-size:14px;font-weight:600}
+.page-sub{font-size:11.5px;color:var(--text3);margin-top:1px}
+.topbar-right{display:flex;align-items:center;gap:8px;margin-left:auto}
+.search-box{position:relative}
+.search-box input{background:var(--bg3);border:1px solid var(--border2);border-radius:var(--rs);padding:7px 12px 7px 34px;font-size:13px;color:var(--text);width:220px;transition:all .2s}
+.search-box input:focus{border-color:var(--accent);width:260px;background:var(--bg4)}
+.search-box input::placeholder{color:var(--text3)}
+.search-box svg{position:absolute;left:10px;top:50%;transform:translateY(-50%);width:14px;height:14px;color:var(--text3);pointer-events:none}
+.icon-btn{width:36px;height:36px;background:var(--bg3);border:1px solid var(--border2);border-radius:var(--rs);display:flex;align-items:center;justify-content:center;color:var(--text2);cursor:pointer;transition:all .15s;position:relative;flex-shrink:0}
+.icon-btn:hover{background:var(--bg4);border-color:var(--border3);color:var(--text)}
+.notif-dot{position:absolute;top:6px;right:6px;width:7px;height:7px;background:var(--red);border-radius:50%;border:2px solid var(--bg2)}
+.btn{display:inline-flex;align-items:center;gap:6px;padding:7px 14px;border-radius:var(--rs);font-size:13px;font-weight:500;cursor:pointer;transition:all .15s;white-space:nowrap}
+.btn svg{width:14px;height:14px;flex-shrink:0}
+.btn-primary{background:var(--accent);color:white;border:1px solid transparent}
+.btn-primary:hover{background:var(--accent2)}
+.btn-outline{background:transparent;border:1px solid var(--border2);color:var(--text2)}
+.btn-outline:hover{background:var(--bg3);border-color:var(--border3);color:var(--text)}
+.btn-danger{background:var(--red-bg);border:1px solid var(--red-border);color:var(--red)}
+.btn-danger:hover{background:rgba(231,76,60,0.2)}
+.btn-success{background:var(--green-bg);border:1px solid var(--green-border);color:var(--green)}
+.btn-sm{padding:5px 10px;font-size:12px}
+
+/* ── CARDS ── */
+.card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--rl);padding:20px}
+.card-sm{padding:16px}
+.card-hd{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px}
+.card-title{font-size:13.5px;font-weight:600;color:var(--text)}
+.card-sub{font-size:11.5px;color:var(--text3);margin-top:2px}
+.card-actions{display:flex;align-items:center;gap:6px}
+
+/* ── STATS ── */
+.stats-row{display:grid;grid-template-columns:repeat(5,1fr);gap:12px;margin-bottom:20px}
+.stat{background:var(--bg2);border:1px solid var(--border);border-radius:var(--rl);padding:16px 18px;display:flex;flex-direction:column;gap:10px;transition:border-color .2s}
+.stat:hover{border-color:var(--border2)}
+.stat-top{display:flex;align-items:center;justify-content:space-between}
+.stat-icon{width:38px;height:38px;border-radius:9px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.stat-icon svg{width:18px;height:18px}
+.stat-trend{font-size:11px;font-weight:500;display:flex;align-items:center;gap:3px}
+.stat-trend.up{color:var(--green)}
+.stat-trend.down{color:var(--red)}
+.stat-trend.neutral{color:var(--text3)}
+.stat-label{font-size:11.5px;color:var(--text3)}
+.stat-value{font-size:26px;font-weight:600;font-family:'DM Mono',monospace;letter-spacing:-.5px;color:var(--text);line-height:1}
+
+/* ── BADGE ── */
+.badge{display:inline-flex;align-items:center;gap:4px;padding:3px 8px;border-radius:100px;font-size:11px;font-weight:500;white-space:nowrap}
+.badge::before{content:'';width:5px;height:5px;border-radius:50%;flex-shrink:0}
+.badge-green{background:var(--green-bg);color:var(--green);border:1px solid var(--green-border)}.badge-green::before{background:var(--green)}
+.badge-amber{background:var(--amber-bg);color:var(--amber);border:1px solid var(--amber-border)}.badge-amber::before{background:var(--amber)}
+.badge-red{background:var(--red-bg);color:var(--red);border:1px solid var(--red-border)}.badge-red::before{background:var(--red)}
+.badge-blue{background:var(--accent-bg);color:var(--accent2);border:1px solid var(--accent-border)}.badge-blue::before{background:var(--accent2)}
+.badge-gray{background:var(--bg3);color:var(--text3);border:1px solid var(--border2)}.badge-gray::before{background:var(--text3)}
+.badge-purple{background:var(--purple-bg);color:var(--purple2);border:1px solid var(--purple-border)}.badge-purple::before{background:var(--purple)}
+.badge-teal{background:var(--teal-bg);color:var(--teal);border:1px solid rgba(26,188,156,0.3)}.badge-teal::before{background:var(--teal)}
+
+/* ── TABLE ── */
+.tbl-wrap{overflow-x:auto}
+.tbl{width:100%;border-collapse:collapse;font-size:13px}
+.tbl th{text-align:left;padding:9px 14px;font-size:10.5px;font-weight:500;text-transform:uppercase;letter-spacing:.6px;color:var(--text3);border-bottom:1px solid var(--border);white-space:nowrap}
+.tbl td{padding:12px 14px;border-bottom:1px solid var(--border);color:var(--text2);vertical-align:middle}
+.tbl tr:last-child td{border-bottom:none}
+.tbl tr:hover td{background:var(--bg3)}
+.tbl-primary{font-weight:500;color:var(--text)}
+.tbl-sub{font-size:11px;color:var(--text3);margin-top:2px}
+
+/* ── GRID LAYOUTS ── */
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.g3{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+.g4{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
+.g-main{display:grid;grid-template-columns:1fr 290px;gap:16px}
+.g-main3{display:grid;grid-template-columns:1fr 1fr 290px;gap:16px}
+.stack{display:flex;flex-direction:column;gap:16px}
+.gap8{gap:8px}
+.mb16{margin-bottom:16px}
+.mb20{margin-bottom:20px}
+
+/* ── VEHICLE CARDS ── */
+.vcard{background:var(--bg2);border:1px solid var(--border);border-radius:var(--rl);padding:16px;transition:all .2s;cursor:default}
+.vcard:hover{border-color:var(--border2);background:var(--bg3);transform:translateY(-1px)}
+.vcard-top{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:14px}
+.vcard-icon{width:40px;height:40px;background:var(--bg3);border-radius:10px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.vcard-icon svg{width:20px;height:20px;color:var(--text3)}
+.vcard-id{font-size:13.5px;font-weight:600;color:var(--text)}
+.vcard-fleet{font-size:11px;color:var(--text3);font-family:'DM Mono',monospace}
+.vcard-rows{display:flex;flex-direction:column;gap:6px;font-size:12px;margin-bottom:14px}
+.vcard-row{display:flex;justify-content:space-between;align-items:center}
+.vcard-k{color:var(--text3)}
+.vcard-v{color:var(--text2);font-weight:500;text-align:right;max-width:120px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.progress-bar{width:100%;height:4px;background:var(--bg4);border-radius:100px;overflow:hidden;margin-top:10px;margin-bottom:14px}
+.progress-fill{height:100%;border-radius:100px;transition:width .3s}
+.vcard-btns{display:flex;gap:6px}
+.vcard-btn{flex:1;padding:6px 8px;font-size:12px;font-weight:500;border-radius:6px;background:var(--bg4);border:1px solid var(--border2);color:var(--text2);cursor:pointer;transition:all .15s;text-align:center}
+.vcard-btn:hover{background:var(--bg5);border-color:var(--border3);color:var(--text)}
+.vcard-btn.red{color:var(--red);border-color:var(--red-border)}.vcard-btn.red:hover{background:var(--red-bg)}
+.vcard-btn.blue{color:var(--accent2);border-color:var(--accent-border)}.vcard-btn.blue:hover{background:var(--accent-bg)}
+
+/* ── TRANSFER CARD ── */
+.tcard{background:var(--bg3);border:1px solid var(--border);border-radius:var(--rl);padding:14px 16px;transition:border-color .15s}
+.tcard:hover{border-color:var(--border2)}
+.tcard-top{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;margin-bottom:10px}
+.tcard-vehicle{display:flex;align-items:center;gap:10px}
+.tcard-icon{width:36px;height:36px;background:var(--bg4);border-radius:9px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.tcard-icon svg{width:17px;height:17px;color:var(--text3)}
+.route{display:flex;align-items:center;gap:6px;font-size:12.5px;color:var(--text2);flex-wrap:wrap}
+.route svg{width:12px;height:12px;color:var(--text3);flex-shrink:0}
+.tcard-meta{display:flex;justify-content:space-between;align-items:center;font-size:11.5px;color:var(--text3);padding-top:10px;border-top:1px solid var(--border);flex-wrap:wrap;gap:4px}
+
+/* ── MAINTENANCE ── */
+.maint-item{display:flex;align-items:center;gap:12px;padding:12px 0;border-bottom:1px solid var(--border)}
+.maint-item:last-child{border-bottom:none}
+.maint-icon{width:36px;height:36px;border-radius:9px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.maint-icon svg{width:17px;height:17px}
+.maint-info{flex:1;min-width:0}
+.maint-name{font-size:13px;font-weight:500;color:var(--text)}
+.maint-desc{font-size:11.5px;color:var(--text3);margin-top:2px}
+.maint-date{font-size:11.5px;font-weight:500;text-align:right;white-space:nowrap}
+
+/* ── DRIVER CARDS ── */
+.dcard{background:var(--bg2);border:1px solid var(--border);border-radius:var(--rl);padding:16px;transition:all .2s}
+.dcard:hover{border-color:var(--border2);background:var(--bg3)}
+.dcard-top{display:flex;align-items:center;gap:12px;margin-bottom:12px}
+.dav{width:44px;height:44px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:600;color:white;flex-shrink:0}
+.dcard-name{font-size:13.5px;font-weight:600;color:var(--text)}
+.dcard-id{font-size:11px;color:var(--text3);font-family:'DM Mono',monospace}
+.dcard-rows{display:flex;flex-direction:column;gap:6px;font-size:12px;margin-bottom:12px}
+
+/* ── ANALYTICS ── */
+.chart-wrap{position:relative;width:100%;height:180px;margin-top:8px}
+canvas{display:block}
+.donut-wrap{display:flex;align-items:center;gap:20px}
+.donut-canvas{flex-shrink:0}
+.donut-legend{display:flex;flex-direction:column;gap:8px;font-size:12px}
+.legend-row{display:flex;align-items:center;gap:8px}
+.legend-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0}
+.legend-label{color:var(--text2)}
+.legend-val{margin-left:auto;font-weight:600;color:var(--text);font-family:'DM Mono',monospace}
+
+/* ── ALERTS / NOTIF ── */
+.alert-panel{position:fixed;top:var(--topbar);right:0;width:340px;background:var(--bg2);border-left:1px solid var(--border);border-bottom:1px solid var(--border);border-radius:0 0 0 var(--rl);z-index:80;padding:16px;display:none;max-height:calc(100vh - var(--topbar));overflow-y:auto}
+.alert-panel.open{display:block}
+.alert-panel-hd{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px}
+.notif-item{display:flex;gap:10px;padding:10px;border-radius:var(--rs);border:1px solid var(--border);margin-bottom:8px;cursor:pointer;transition:background .15s}
+.notif-item:hover{background:var(--bg3)}
+.notif-item.unread{background:var(--accent-bg);border-color:var(--accent-border)}
+.notif-icon{width:32px;height:32px;border-radius:8px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.notif-icon svg{width:15px;height:15px}
+.notif-title{font-size:12.5px;font-weight:500;color:var(--text);margin-bottom:2px}
+.notif-msg{font-size:11.5px;color:var(--text3);line-height:1.4}
+.notif-time{font-size:10.5px;color:var(--text3);margin-top:3px}
+
+/* ── FILTER BAR ── */
+.filter-bar{display:flex;align-items:center;gap:8px;margin-bottom:16px;flex-wrap:wrap}
+.filter-chip{padding:5px 12px;border-radius:100px;font-size:12px;font-weight:500;cursor:pointer;border:1px solid var(--border2);background:transparent;color:var(--text3);transition:all .15s}
+.filter-chip:hover{border-color:var(--border3);color:var(--text2)}
+.filter-chip.active{background:var(--accent-bg);border-color:var(--accent-border);color:var(--accent2)}
+.filter-right{margin-left:auto;display:flex;gap:8px}
+
+/* ── MODAL ── */
+.overlay{position:fixed;inset:0;background:rgba(0,0,0,0.7);z-index:200;display:none;align-items:center;justify-content:center;padding:20px;backdrop-filter:blur(2px)}
+.overlay.open{display:flex}
+.modal{background:var(--bg2);border:1px solid var(--border2);border-radius:var(--rl);width:100%;max-width:560px;max-height:88vh;overflow-y:auto;box-shadow:0 24px 64px rgba(0,0,0,0.6)}
+.modal-hd{padding:20px 22px 16px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:12px;justify-content:space-between;position:sticky;top:0;background:var(--bg2);z-index:1}
+.modal-title{font-size:14.5px;font-weight:600}
+.modal-x{width:28px;height:28px;background:var(--bg3);border-radius:6px;display:flex;align-items:center;justify-content:center;cursor:pointer;border:1px solid var(--border);color:var(--text2);transition:all .15s}
+.modal-x:hover{border-color:var(--border2);color:var(--text)}
+.modal-body{padding:20px 22px}
+.modal-ft{padding:14px 22px;border-top:1px solid var(--border);display:flex;justify-content:flex-end;gap:8px;position:sticky;bottom:0;background:var(--bg2)}
+.form-row{margin-bottom:14px}
+.form-label{font-size:12px;font-weight:500;color:var(--text2);margin-bottom:5px;display:flex;align-items:center;gap:4px}
+.req{color:var(--red);font-size:10px}
+.form-input{width:100%;background:var(--bg3);border:1px solid var(--border2);border-radius:var(--rs);padding:8px 12px;font-size:13px;color:var(--text);transition:all .15s}
+.form-input:focus{border-color:var(--accent);background:var(--bg4)}
+.form-input::placeholder{color:var(--text3)}
+select.form-input{cursor:pointer}
+textarea.form-input{resize:vertical;min-height:70px}
+.fg2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.fg3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px}
+.form-hint{font-size:11px;color:var(--text3);margin-top:3px}
+.form-section{font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.8px;color:var(--text3);margin:18px 0 10px;padding-bottom:6px;border-bottom:1px solid var(--border)}
+.checkbox-row{display:flex;align-items:center;gap:8px;cursor:pointer}
+.checkbox-row input{width:15px;height:15px;accent-color:var(--accent);cursor:pointer}
+.checkbox-row label{font-size:13px;color:var(--text2);cursor:pointer}
+
+/* ── KPI PILL ── */
+.kpi-pill{display:flex;align-items:center;gap:6px;padding:6px 12px;background:var(--bg3);border:1px solid var(--border);border-radius:100px;font-size:12px;white-space:nowrap}
+.kpi-pill svg{width:13px;height:13px}
+
+/* ── EMPTY STATE ── */
+.empty{text-align:center;padding:48px 24px}
+.empty-icon{width:52px;height:52px;background:var(--bg3);border:1px solid var(--border);border-radius:14px;display:flex;align-items:center;justify-content:center;margin:0 auto 14px}
+.empty-icon svg{width:24px;height:24px;color:var(--text3)}
+.empty h3{font-size:14px;font-weight:500;color:var(--text2);margin-bottom:5px}
+.empty p{font-size:12.5px;color:var(--text3);max-width:260px;margin:0 auto;line-height:1.5}
+
+/* ── SCROLLBAR ── */
+::-webkit-scrollbar{width:4px;height:4px}
+::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:var(--border2);border-radius:100px}
+::-webkit-scrollbar-thumb:hover{background:var(--border3)}
+
+/* ── TOAST ── */
+.toasts{position:fixed;bottom:20px;right:20px;z-index:500;display:flex;flex-direction:column;gap:8px;pointer-events:none}
+.toast{background:var(--bg2);border:1px solid var(--border2);border-radius:var(--rs);padding:12px 16px;font-size:13px;color:var(--text);display:flex;align-items:center;gap:10px;box-shadow:0 8px 24px rgba(0,0,0,0.4);pointer-events:all;animation:slide-in .25s ease;max-width:320px}
+.toast.success{border-color:var(--green-border)}
+.toast.error{border-color:var(--red-border)}
+.toast svg{width:16px;height:16px;flex-shrink:0}
+@keyframes slide-in{from{transform:translateX(100%);opacity:0}to{transform:translateX(0);opacity:1}}
+
+/* ── MISC ── */
+.divider{border:none;border-top:1px solid var(--border);margin:16px 0}
+.tag{display:inline-flex;align-items:center;padding:2px 8px;background:var(--bg4);border:1px solid var(--border2);border-radius:100px;font-size:11px;color:var(--text3)}
+.mileage-bar{height:3px;background:var(--bg4);border-radius:100px;overflow:hidden;margin-top:6px}
+.mileage-fill{height:100%;background:var(--accent);border-radius:100px}
+.inline-flex{display:inline-flex;align-items:center;gap:6px}
+.text-green{color:var(--green)}
+.text-amber{color:var(--amber)}
+.text-red{color:var(--red)}
+.text-accent{color:var(--accent2)}
+.text-muted{color:var(--text3)}
+.fw6{font-weight:600}
+.mono{font-family:'DM Mono',monospace}
+.fs11{font-size:11px}
+.fs12{font-size:12px}
+.fs13{font-size:13px}
+.w100{width:100%}
+</style>
+<script src="chrome-extension://daiklcgdelcbcmjepemiklfglodmofbm/static/js/workers.min.js"></script></head>
+<body>
+<div class="app">
+
+<!-- ═══ SIDEBAR ═══ -->
+<aside class="sidebar" id="sidebar">
+  <div class="logo">
+    <div class="logo-mark">
+      <svg viewBox="0 0 24 24"><path d="M20 8h-3V4H3c-1.1 0-2 .9-2 2v11h2c0 1.66 1.34 3 3 3s3-1.34 3-3h6c0 1.66 1.34 3 3 3s3-1.34 3-3h2v-5l-3-4zm-.5 1.5 1.96 2.5H17V9.5h2.5zM6 18c-.55 0-1-.45-1-1s.45-1 1-1 1 .45 1 1-.45 1-1 1zm2.22-3c-.55-.61-1.35-1-2.22-1s-1.67.39-2.22 1H3V6h12v9H8.22zM18 18c-.55 0-1-.45-1-1s.45-1 1-1 1 .45 1 1-.45 1-1 1z"></path></svg>
+    </div>
+    <div>
+      <div class="logo-name">Fleet<span>Ops</span></div>
+      <div class="logo-ver">v3.0 · Pro Edition</div>
+    </div>
+  </div>
+
+  <nav class="nav">
+    <div class="nav-section">Operations</div>
+    <div class="nav-item active" onclick="nav(&#39;dashboard&#39;,this)">
+      <svg viewBox="0 0 24 24" fill="currentColor"><path d="M3 13h8V3H3v10zm0 8h8v-6H3v6zm10 0h8V11h-8v10zm0-18v6h8V3h-8z"></path></svg>
+      Dashboard
+    </div>
+    <div class="nav-item" onclick="nav(&#39;analytics&#39;,this)">
+      <svg viewBox="0 0 24 24" fill="currentColor"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zM9 17H7v-7h2v7zm4 0h-2V7h2v10zm4 0h-2v-4h2v4z"></path></svg>
+      Analytics
+    </div>
+    <div class="nav-item" onclick="nav(&#39;fleet&#39;,this)">
+      <svg viewBox="0 0 24 24" fill="currentColor"><path d="M20 8h-3V4H3c-1.1 0-2 .9-2 2v11h2c0 1.66 1.34 3 3 3s3-1.34 3-3h6c0 1.66 1.34 3 3 3s3-1.34 3-3h2v-5l-3-4z"></path></svg>
+      Fleet Management
+    </div>
+    <div class="nav-item" onclick="nav(&#39;transfers&#39;,this)" id="nav-transfers">
+      <svg viewBox="0 0 24 24" fill="currentColor"><path d="M6.99 11L3 15l3.99 4v-3H14v-2H6.99v-3zM21 9l-3.99-4v3H10v2h7.01v3L21 9z"></path></svg>
+      Vehicle Transfers
+      <span class="nav-badge" id="pending-badge">1</span>
+    </div>
+    <div class="nav-item" onclick="nav(&#39;maintenance&#39;,this)" id="nav-maint">
+      <svg viewBox="0 0 24 24" fill="currentColor"><path d="M22.7 19l-9.1-9.1c.9-2.3.4-5-1.5-6.9-2-2-5-2.4-7.4-1.3L9 6 6 9 1.6 4.7C.4 7.1.9 10.1 2.9 12.1c1.9 1.9 4.6 2.4 6.9 1.5l9.1 9.1c.4.4 1 .4 1.4 0l2.3-2.3c.5-.4.5-1.1.1-1.4z"></path></svg>
+      Maintenance
+      <span class="nav-badge amber" id="maint-badge" style="display: none;">0</span>
+    </div>
+    <div class="nav-section">Management</div>
+    <div class="nav-item" onclick="nav(&#39;drivers&#39;,this)">
+      <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"></path></svg>
+      Drivers
+    </div>
+    <div class="nav-item" onclick="nav(&#39;costcenters&#39;,this)">
+      <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 7V3H2v18h20V7H12zM6 19H4v-2h2v2zm0-4H4v-2h2v2zm0-4H4V9h2v2zm0-4H4V5h2v2zm4 12H8v-2h2v2zm0-4H8v-2h2v2zm0-4H8V9h2v2zm0-4H8V5h2v2zm10 12h-8v-2h2v-2h-2v-2h2v-2h-2V9h8v10zm-2-8h-2v2h2v-2zm0 4h-2v2h2v-2z"></path></svg>
+      Cost Centers
+    </div>
+    <div class="nav-section">System</div>
+    <div class="nav-item" onclick="nav(&#39;settings&#39;,this)">
+      <svg viewBox="0 0 24 24" fill="currentColor"><path d="M19.14 12.94c.04-.3.06-.61.06-.94 0-.32-.02-.64-.07-.94l2.03-1.58c.18-.14.23-.41.12-.61l-1.92-3.32c-.12-.22-.37-.29-.59-.22l-2.39.96c-.5-.38-1.03-.7-1.62-.94l-.36-2.54c-.04-.24-.24-.41-.48-.41h-3.84c-.24 0-.43.17-.47.41l-.36 2.54c-.59.24-1.13.56-1.62.94l-2.39-.96c-.22-.08-.47 0-.59.22L2.74 8.87c-.12.21-.08.47.12.61l2.03 1.58c-.05.3-.09.63-.09.94s.02.64.07.94l-2.03 1.58c-.18.14-.23.41-.12.61l1.92 3.32c.12.22.37.29.59.22l2.39-.96c.5.38 1.03.7 1.62.94l.36 2.54c.05.24.24.41.48.41h3.84c.24 0 .44-.17.47-.41l.36-2.54c.59-.24 1.13-.56 1.62-.94l2.39.96c.22.08.47 0 .59-.22l1.92-3.32c.12-.22.07-.47-.12-.61l-2.01-1.58zM12 15.6c-1.98 0-3.6-1.62-3.6-3.6s1.62-3.6 3.6-3.6 3.6 1.62 3.6 3.6-1.62 3.6-3.6 3.6z"></path></svg>
+      Settings
+    </div>
+  </nav>
+
+  <div class="sidebar-bottom">
+    <div class="user-card">
+      <div class="avatar">HZ</div>
+      <div>
+        <div class="user-name">Hassan Zarroug</div>
+        <div class="user-role">Fleet Administrator</div>
+      </div>
+    </div>
+  </div>
+</aside>
+
+<!-- ═══ MAIN ═══ -->
+<div class="main">
+  <header class="topbar">
+    <div class="page-info" id="page-info">
+      <div class="page-title">Fleet Dashboard</div>
+      <div class="page-sub">Welcome back — here's your fleet overview</div>
+    </div>
+    <div class="topbar-right">
+      <div class="search-box">
+        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"></path></svg>
+        <input type="text" placeholder="Search fleet, drivers, transfers…" id="gsearch" oninput="doSearch(this.value)">
+      </div>
+      <div class="icon-btn" onclick="toggleNotifs()" id="notif-btn" title="Notifications">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M12 22c1.1 0 2-.9 2-2h-4c0 1.1.9 2 2 2zm6-6v-5c0-3.07-1.64-5.64-4.5-6.32V4c0-.83-.67-1.5-1.5-1.5s-1.5.67-1.5 1.5v.68C7.63 5.36 6 7.92 6 11v5l-2 2v1h16v-1l-2-2z"></path></svg>
+        <span class="notif-dot" id="notif-dot"></span>
+      </div>
+      <button class="btn btn-primary" id="main-btn" style="display:none" onclick="openMainModal()">
+        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"></path></svg>
+        <span id="main-btn-lbl">Add</span>
+      </button>
+    </div>
+  </header>
+
+  <!-- Notification Panel -->
+  <div class="alert-panel" id="notif-panel">
+    <div class="alert-panel-hd">
+      <span style="font-weight:600;font-size:13.5px">Notifications</span>
+      <button class="btn btn-outline btn-sm" onclick="markAllRead()">Mark all read</button>
+    </div>
+    <div id="notif-list"></div>
+  </div>
+
+  <main class="content" id="page">
+  <div class="stats-row">
+    <div class="stat">
+    <div class="stat-top">
+      <div class="stat-icon" style="background:#4f8ef722"><svg width="18" height="18" viewBox="0 0 24 24" fill="#4f8ef7"><path d="M18.92 6.01C18.72 5.42 18.16 5 17.5 5h-11c-.66 0-1.21.42-1.42 1.01L3 12v8c0 .55.45 1 1 1h1c.55 0 1-.45 1-1v-1h12v1c0 .55.45 1 1 1h1c.55 0 1-.45 1-1v-8l-2.08-5.99zM6.5 16c-.83 0-1.5-.67-1.5-1.5S5.67 13 6.5 13s1.5.67 1.5 1.5S7.33 16 6.5 16zm11 0c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5zM5 11l1.5-4.5h11L19 11H5z"></path></svg></div>
+      <span class="stat-trend up">↑ +2 this month</span>
+    </div>
+    <div class="stat-label">Total Vehicles</div>
+    <div class="stat-value">8</div>
+  </div>
+    <div class="stat">
+    <div class="stat-top">
+      <div class="stat-icon" style="background:#2ecc7122"><svg width="18" height="18" viewBox="0 0 24 24" fill="#2ecc71"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 14l-4-4 1.41-1.41L10 13.17l6.59-6.59L18 8l-8 8z"></path></svg></div>
+      <span class="stat-trend neutral">→ of 8 total</span>
+    </div>
+    <div class="stat-label">Active Fleet</div>
+    <div class="stat-value">7</div>
+  </div>
+    <div class="stat">
+    <div class="stat-top">
+      <div class="stat-icon" style="background:#9b59b622"><svg width="18" height="18" viewBox="0 0 24 24" fill="#9b59b6"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zM9 17H7v-7h2v7zm4 0h-2V7h2v10zm4 0h-2v-4h2v4z"></path></svg></div>
+      <span class="stat-trend up">↑ above target</span>
+    </div>
+    <div class="stat-label">Utilization</div>
+    <div class="stat-value">88%</div>
+  </div>
+    <div class="stat">
+    <div class="stat-top">
+      <div class="stat-icon" style="background:#f39c1222"><svg width="18" height="18" viewBox="0 0 24 24" fill="#f39c12"><path d="M6.99 11L3 15l3.99 4v-3H14v-2H6.99v-3zM21 9l-3.99-4v3H10v2h7.01v3L21 9z"></path></svg></div>
+      <span class="stat-trend down">↓ require approval</span>
+    </div>
+    <div class="stat-label">Pending Transfers</div>
+    <div class="stat-value">1</div>
+  </div>
+    <div class="stat">
+    <div class="stat-top">
+      <div class="stat-icon" style="background:#1abc9c22"><svg width="18" height="18" viewBox="0 0 24 24" fill="#1abc9c"><path d="M11.8 10.9c-2.27-.59-3-1.2-3-2.15 0-1.09 1.01-1.85 2.7-1.85 1.78 0 2.44.85 2.5 2.1h2.21c-.07-1.72-1.12-3.3-3.21-3.81V3h-3v2.16c-1.94.42-3.5 1.68-3.5 3.61 0 2.31 1.91 3.46 4.7 4.13 2.5.6 3 1.48 3 2.41 0 .69-.49 1.79-2.7 1.79-2.06 0-2.87-.92-2.98-2.1h-2.2c.12 2.19 1.76 3.42 3.68 3.83V21h3v-2.15c1.95-.37 3.5-1.5 3.5-3.55 0-2.84-2.43-3.81-4.7-4.4z"></path></svg></div>
+      <span class="stat-trend neutral">→ across all centers</span>
+    </div>
+    <div class="stat-label">Total Fleet Spend</div>
+    <div class="stat-value">SAR 94,200</div>
+  </div>
+  </div>
+
+  <div class="g-main mb16">
+    <div class="card">
+      <div class="card-hd">
+        <div><div class="card-title">Recent Transfers</div></div>
+        <button class="btn btn-outline btn-sm" onclick="nav(&#39;transfers&#39;,document.querySelectorAll(&#39;.nav-item&#39;)[3])">View all →</button>
+      </div>
+      <div class="tbl-wrap">
+        <table class="tbl"><thead><tr><th>Vehicle</th><th>Route</th><th>Status</th><th>Requested by</th><th>When</th></tr></thead><tbody>
+        <tr>
+          <td><div class="inline-flex"><svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M18.92 6.01C18.72 5.42 18.16 5 17.5 5h-11c-.66 0-1.21.42-1.42 1.01L3 12v8c0 .55.45 1 1 1h1c.55 0 1-.45 1-1v-1h12v1c0 .55.45 1 1 1h1c.55 0 1-.45 1-1v-8l-2.08-5.99zM6.5 16c-.83 0-1.5-.67-1.5-1.5S5.67 13 6.5 13s1.5.67 1.5 1.5S7.33 16 6.5 16zm11 0c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5zM5 11l1.5-4.5h11L19 11H5z"></path></svg><div><div class="tbl-primary">Toyota Land Cruiser</div><div class="tbl-sub mono">FL-001</div></div></div></td>
+          <td><div class="route"><span>Unassigned</span><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 4l-1.41 1.41L16.17 11H4v2h12.17l-5.58 5.59L12 20l8-8z"></path></svg><span>Operations North</span></div></td>
+          <td><span class="badge badge-amber">Pending</span></td>
+          <td class="text-muted">HMZ</td>
+          <td class="text-muted fs12">6d ago</td>
+        </tr><tr>
+          <td><div class="inline-flex"><svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M20 8h-3V4H3c-1.1 0-2 .9-2 2v11h2c0 1.66 1.34 3 3 3s3-1.34 3-3h6c0 1.66 1.34 3 3 3s3-1.34 3-3h2v-5l-3-4z"></path></svg><div><div class="tbl-primary">Ford Transit</div><div class="tbl-sub mono">FL-002</div></div></div></td>
+          <td><div class="route"><span>Operations North</span><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 4l-1.41 1.41L16.17 11H4v2h12.17l-5.58 5.59L12 20l8-8z"></path></svg><span>Logistics South</span></div></td>
+          <td><span class="badge badge-green">Completed</span></td>
+          <td class="text-muted">Ahmed Al-Rashid</td>
+          <td class="text-muted fs12">12d ago</td>
+        </tr><tr>
+          <td><div class="inline-flex"><svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M18.92 6.01C18.72 5.42 18.16 5 17.5 5h-11c-.66 0-1.21.42-1.42 1.01L3 12v8c0 .55.45 1 1 1h1c.55 0 1-.45 1-1v-1h12v1c0 .55.45 1 1 1h1c.55 0 1-.45 1-1v-8l-2.08-5.99zM6.5 16c-.83 0-1.5-.67-1.5-1.5S5.67 13 6.5 13s1.5.67 1.5 1.5S7.33 16 6.5 16zm11 0c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5zM5 11l1.5-4.5h11L19 11H5z"></path></svg><div><div class="tbl-primary">Nissan Patrol</div><div class="tbl-sub mono">FL-004</div></div></div></td>
+          <td><div class="route"><span>Executive Fleet</span><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 4l-1.41 1.41L16.17 11H4v2h12.17l-5.58 5.59L12 20l8-8z"></path></svg><span>Operations North</span></div></td>
+          <td><span class="badge badge-green">Completed</span></td>
+          <td class="text-muted">Hassan Zarroug</td>
+          <td class="text-muted fs12">10d ago</td>
+        </tr><tr>
+          <td><div class="inline-flex"><svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M18.92 6.01C18.72 5.42 18.16 5 17.5 5h-11c-.66 0-1.21.42-1.42 1.01L3 12v8c0 .55.45 1 1 1h1c.55 0 1-.45 1-1v-1h12v1c0 .55.45 1 1 1h1c.55 0 1-.45 1-1v-8l-2.08-5.99zM6.5 16c-.83 0-1.5-.67-1.5-1.5S5.67 13 6.5 13s1.5.67 1.5 1.5S7.33 16 6.5 16zm11 0c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5zM5 11l1.5-4.5h11L19 11H5z"></path></svg><div><div class="tbl-primary">Toyota Land Cruiser</div><div class="tbl-sub mono">FL-001</div></div></div></td>
+          <td><div class="route"><span>Logistics South</span><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 4l-1.41 1.41L16.17 11H4v2h12.17l-5.58 5.59L12 20l8-8z"></path></svg><span>Executive Fleet</span></div></td>
+          <td><span class="badge badge-blue">In Progress</span></td>
+          <td class="text-muted">Sara Al-Malik</td>
+          <td class="text-muted fs12">9d ago</td>
+        </tr><tr>
+          <td><div class="inline-flex"><svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M20 8h-3V4H3c-1.1 0-2 .9-2 2v11h2c0 1.66 1.34 3 3 3s3-1.34 3-3h6c0 1.66 1.34 3 3 3s3-1.34 3-3h2v-5l-3-4z"></path></svg><div><div class="tbl-primary">Mercedes Sprinter</div><div class="tbl-sub mono">FL-005</div></div></div></td>
+          <td><div class="route"><span>Unassigned</span><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 4l-1.41 1.41L16.17 11H4v2h12.17l-5.58 5.59L12 20l8-8z"></path></svg><span>Logistics South</span></div></td>
+          <td><span class="badge badge-green">Completed</span></td>
+          <td class="text-muted">Ahmed Al-Rashid</td>
+          <td class="text-muted fs12">16d ago</td>
+        </tr>
+        </tbody></table>
+      </div>
+    </div>
+    <div class="stack">
+      <div class="card card-sm">
+        <div class="card-title mb16">Fleet Status</div>
+        <div style="display:flex;flex-direction:column;gap:10px">
+          
+          <div>
+            <div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:5px">
+              <span style="color:var(--text2)">available</span>
+              <span style="color:var(--text);font-weight:600;font-family:&#39;DM Mono&#39;,monospace">5 <span style="color:var(--text3);font-weight:400">(63%)</span></span>
+            </div>
+            <div class="progress-bar" style="height:6px"><div class="progress-fill" style="width:62.5%;background:var(--green)"></div></div>
+          </div>
+          <div>
+            <div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:5px">
+              <span style="color:var(--text2)">in use</span>
+              <span style="color:var(--text);font-weight:600;font-family:&#39;DM Mono&#39;,monospace">2 <span style="color:var(--text3);font-weight:400">(25%)</span></span>
+            </div>
+            <div class="progress-bar" style="height:6px"><div class="progress-fill" style="width:25%;background:var(--accent2)"></div></div>
+          </div>
+          <div>
+            <div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:5px">
+              <span style="color:var(--text2)">maintenance</span>
+              <span style="color:var(--text);font-weight:600;font-family:&#39;DM Mono&#39;,monospace">0 <span style="color:var(--text3);font-weight:400">(0%)</span></span>
+            </div>
+            <div class="progress-bar" style="height:6px"><div class="progress-fill" style="width:0%;background:var(--amber)"></div></div>
+          </div>
+          <div>
+            <div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:5px">
+              <span style="color:var(--text2)">out of service</span>
+              <span style="color:var(--text);font-weight:600;font-family:&#39;DM Mono&#39;,monospace">1 <span style="color:var(--text3);font-weight:400">(13%)</span></span>
+            </div>
+            <div class="progress-bar" style="height:6px"><div class="progress-fill" style="width:12.5%;background:var(--red)"></div></div>
+          </div>
+        </div>
+      </div>
+      <div class="card card-sm">
+        <div class="card-title mb16">Upcoming Maintenance</div>
+        <div class="text-muted fs12">No upcoming maintenance</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="g3">
+    <div class="card card-sm">
+      <div class="card-title mb16">Quick Actions</div>
+      <div style="display:flex;align-items:center;gap:10px;padding:9px 10px;border-radius:var(--rs);background:var(--bg3);border:1px solid var(--border);cursor:pointer;margin-bottom:6px;font-size:13px;color:var(--text2);transition:all .15s" onmouseover="this.style.borderColor=&#39;var(--border2)&#39;;this.style.color=&#39;var(--text)&#39;" onmouseout="this.style.borderColor=&#39;var(--border)&#39;;this.style.color=&#39;var(--text2)&#39;" onclick="nav(&#39;fleet&#39;,document.querySelectorAll(&#39;.nav-item&#39;)[2])">
+        <div style="width:28px;height:28px;background:var(--accent-bg);border-radius:7px;display:flex;align-items:center;justify-content:center;flex-shrink:0;color:var(--accent2)"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"></path></svg></div>
+        <span>Add Vehicle</span>
+      </div><div style="display:flex;align-items:center;gap:10px;padding:9px 10px;border-radius:var(--rs);background:var(--bg3);border:1px solid var(--border);cursor:pointer;margin-bottom:6px;font-size:13px;color:var(--text2);transition:all .15s" onmouseover="this.style.borderColor=&#39;var(--border2)&#39;;this.style.color=&#39;var(--text)&#39;" onmouseout="this.style.borderColor=&#39;var(--border)&#39;;this.style.color=&#39;var(--text2)&#39;" onclick="nav(&#39;transfers&#39;,document.querySelectorAll(&#39;.nav-item&#39;)[3])">
+        <div style="width:28px;height:28px;background:var(--accent-bg);border-radius:7px;display:flex;align-items:center;justify-content:center;flex-shrink:0;color:var(--accent2)"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M6.99 11L3 15l3.99 4v-3H14v-2H6.99v-3zM21 9l-3.99-4v3H10v2h7.01v3L21 9z"></path></svg></div>
+        <span>New Transfer</span>
+      </div><div style="display:flex;align-items:center;gap:10px;padding:9px 10px;border-radius:var(--rs);background:var(--bg3);border:1px solid var(--border);cursor:pointer;margin-bottom:6px;font-size:13px;color:var(--text2);transition:all .15s" onmouseover="this.style.borderColor=&#39;var(--border2)&#39;;this.style.color=&#39;var(--text)&#39;" onmouseout="this.style.borderColor=&#39;var(--border)&#39;;this.style.color=&#39;var(--text2)&#39;" onclick="nav(&#39;maintenance&#39;,document.querySelectorAll(&#39;.nav-item&#39;)[4])">
+        <div style="width:28px;height:28px;background:var(--accent-bg);border-radius:7px;display:flex;align-items:center;justify-content:center;flex-shrink:0;color:var(--accent2)"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M22.7 19l-9.1-9.1c.9-2.3.4-5-1.5-6.9-2-2-5-2.4-7.4-1.3L9 6 6 9 1.6 4.7C.4 7.1.9 10.1 2.9 12.1c1.9 1.9 4.6 2.4 6.9 1.5l9.1 9.1c.4.4 1 .4 1.4 0l2.3-2.3c.5-.4.5-1.1.1-1.4z"></path></svg></div>
+        <span>Schedule Maintenance</span>
+      </div><div style="display:flex;align-items:center;gap:10px;padding:9px 10px;border-radius:var(--rs);background:var(--bg3);border:1px solid var(--border);cursor:pointer;margin-bottom:6px;font-size:13px;color:var(--text2);transition:all .15s" onmouseover="this.style.borderColor=&#39;var(--border2)&#39;;this.style.color=&#39;var(--text)&#39;" onmouseout="this.style.borderColor=&#39;var(--border)&#39;;this.style.color=&#39;var(--text2)&#39;" onclick="nav(&#39;drivers&#39;,document.querySelectorAll(&#39;.nav-item&#39;)[5])">
+        <div style="width:28px;height:28px;background:var(--accent-bg);border-radius:7px;display:flex;align-items:center;justify-content:center;flex-shrink:0;color:var(--accent2)"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"></path></svg></div>
+        <span>Add Driver</span>
+      </div><div style="display:flex;align-items:center;gap:10px;padding:9px 10px;border-radius:var(--rs);background:var(--bg3);border:1px solid var(--border);cursor:pointer;margin-bottom:6px;font-size:13px;color:var(--text2);transition:all .15s" onmouseover="this.style.borderColor=&#39;var(--border2)&#39;;this.style.color=&#39;var(--text)&#39;" onmouseout="this.style.borderColor=&#39;var(--border)&#39;;this.style.color=&#39;var(--text2)&#39;" onclick="nav(&#39;costcenters&#39;,document.querySelectorAll(&#39;.nav-item&#39;)[6])">
+        <div style="width:28px;height:28px;background:var(--accent-bg);border-radius:7px;display:flex;align-items:center;justify-content:center;flex-shrink:0;color:var(--accent2)"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 7V3H2v18h20V7H12z"></path></svg></div>
+        <span>Cost Centers</span>
+      </div><div style="display:flex;align-items:center;gap:10px;padding:9px 10px;border-radius:var(--rs);background:var(--bg3);border:1px solid var(--border);cursor:pointer;margin-bottom:6px;font-size:13px;color:var(--text2);transition:all .15s" onmouseover="this.style.borderColor=&#39;var(--border2)&#39;;this.style.color=&#39;var(--text)&#39;" onmouseout="this.style.borderColor=&#39;var(--border)&#39;;this.style.color=&#39;var(--text2)&#39;" onclick="exportCSV(S.vehicles,&#39;fleet-export.csv&#39;)">
+        <div style="width:28px;height:28px;background:var(--accent-bg);border-radius:7px;display:flex;align-items:center;justify-content:center;flex-shrink:0;color:var(--accent2)"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M14 2H6c-1.1 0-2 .9-2 2v16c0 1.1.89 2 2 2h12c1.1 0 2-.9 2-2V8l-6-6zm4 18H6V4h7v5h5v11z"></path></svg></div>
+        <span>Export Fleet CSV</span>
+      </div>
+    </div>
+    <div class="card card-sm" style="grid-column:span 2">
+      <div class="card-hd"><div class="card-title">Cost Center Budget Overview</div></div>
+      
+      <div style="margin-bottom:14px">
+        <div style="display:flex;justify-content:space-between;font-size:12.5px;margin-bottom:5px">
+          <span style="color:var(--text);font-weight:500">Operations North <span class="tag">OPS-N</span></span>
+          <span style="color:var(--amber);font-family:&#39;DM Mono&#39;,monospace;font-weight:600">68%</span>
+        </div>
+        <div class="progress-bar" style="height:6px"><div class="progress-fill" style="width:68%;background:var(--amber)"></div></div>
+        <div style="display:flex;justify-content:space-between;font-size:11px;color:var(--text3);margin-top:4px"><span>SAR 34,200 spent</span><span>SAR 50,000 budget</span></div>
+      </div>
+      <div style="margin-bottom:14px">
+        <div style="display:flex;justify-content:space-between;font-size:12.5px;margin-bottom:5px">
+          <span style="color:var(--text);font-weight:500">Logistics South <span class="tag">LOG-S</span></span>
+          <span style="color:var(--amber);font-family:&#39;DM Mono&#39;,monospace;font-weight:600">72%</span>
+        </div>
+        <div class="progress-bar" style="height:6px"><div class="progress-fill" style="width:72%;background:var(--amber)"></div></div>
+        <div style="display:flex;justify-content:space-between;font-size:11px;color:var(--text3);margin-top:4px"><span>SAR 28,700 spent</span><span>SAR 40,000 budget</span></div>
+      </div>
+      <div style="margin-bottom:14px">
+        <div style="display:flex;justify-content:space-between;font-size:12.5px;margin-bottom:5px">
+          <span style="color:var(--text);font-weight:500">Executive Fleet <span class="tag">EXC-F</span></span>
+          <span style="color:var(--green);font-family:&#39;DM Mono&#39;,monospace;font-weight:600">41%</span>
+        </div>
+        <div class="progress-bar" style="height:6px"><div class="progress-fill" style="width:41%;background:var(--green)"></div></div>
+        <div style="display:flex;justify-content:space-between;font-size:11px;color:var(--text3);margin-top:4px"><span>SAR 12,400 spent</span><span>SAR 30,000 budget</span></div>
+      </div>
+      <div style="margin-bottom:14px">
+        <div style="display:flex;justify-content:space-between;font-size:12.5px;margin-bottom:5px">
+          <span style="color:var(--text);font-weight:500">Field Services <span class="tag">FLD-S</span></span>
+          <span style="color:var(--amber);font-family:&#39;DM Mono&#39;,monospace;font-weight:600">76%</span>
+        </div>
+        <div class="progress-bar" style="height:6px"><div class="progress-fill" style="width:76%;background:var(--amber)"></div></div>
+        <div style="display:flex;justify-content:space-between;font-size:11px;color:var(--text3);margin-top:4px"><span>SAR 18,900 spent</span><span>SAR 25,000 budget</span></div>
+      </div>
+    </div>
+  </div></main>
+</div>
+</div>
+
+<!-- ═══ MODAL ═══ -->
+<div class="overlay" id="modal" onclick="if(event.target===this)closeModal()">
+  <div class="modal">
+    <div class="modal-hd">
+      <span class="modal-title" id="modal-title">Modal</span>
+      <div class="modal-x" onclick="closeModal()">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"></path></svg>
+      </div>
+    </div>
+    <div class="modal-body" id="modal-body"></div>
+    <div class="modal-ft">
+      <button class="btn btn-outline" onclick="closeModal()">Cancel</button>
+      <button class="btn btn-primary" onclick="submitModal()" id="modal-submit">Save</button>
+    </div>
+  </div>
+</div>
+
+<!-- Toast container -->
+<div class="toasts" id="toasts"></div>
+
+<script src="./Fleet Ops — Operations Platform_files/chart.umd.min.js.download"></script>
+<script>
+// ═══════════════════════════════════════════════════════
+// DATA STORE — persisted in localStorage
+// ═══════════════════════════════════════════════════════
+const STORAGE_KEY = 'fleetops_v3';
+
+const defaultData = {
+  vehicles: [
+    {id:1,make:'Toyota',model:'Land Cruiser',year:2022,plate:'ABC-1234',vin:'1HG001',fleet:'FL-001',status:'available',ccId:1,mileage:12400,fuel:'diesel',type:'suv',driverId:1,lastService:'2025-12-01',nextService:'2026-06-01',notes:'Executive reserve unit'},
+    {id:2,make:'Ford',model:'Transit',year:2023,plate:'DEF-5678',vin:'1HG002',fleet:'FL-002',status:'in_use',ccId:2,mileage:8700,fuel:'diesel',type:'van',driverId:2,lastService:'2025-11-15',nextService:'2026-05-15',notes:''},
+    {id:3,make:'Mitsubishi',model:'L200',year:2021,plate:'GHI-9012',vin:'1HG003',fleet:'FL-003',status:'maintenance',ccId:1,mileage:31200,fuel:'diesel',type:'truck',driverId:null,lastService:'2025-09-01',nextService:'2026-03-01',notes:'Engine belt replacement scheduled'},
+    {id:4,make:'Nissan',model:'Patrol',year:2023,plate:'JKL-3456',vin:'1HG004',fleet:'FL-004',status:'available',ccId:3,mileage:4100,fuel:'gasoline',type:'suv',driverId:3,lastService:'2026-01-10',nextService:'2026-07-10',notes:''},
+    {id:5,make:'Mercedes',model:'Sprinter',year:2022,plate:'MNO-7890',vin:'1HG005',fleet:'FL-005',status:'available',ccId:2,mileage:19800,fuel:'diesel',type:'van',driverId:null,lastService:'2025-10-20',nextService:'2026-04-20',notes:'Refrigeration unit installed'},
+    {id:6,make:'Toyota',model:'Hilux',year:2020,plate:'PQR-1234',vin:'1HG006',fleet:'FL-006',status:'out_of_service',ccId:null,mileage:67300,fuel:'diesel',type:'truck',driverId:null,lastService:'2025-07-01',nextService:'2025-12-01',notes:'Awaiting parts — brake system'},
+    {id:7,make:'Hyundai',model:'Staria',year:2024,plate:'STU-5678',vin:'1HG007',fleet:'FL-007',status:'available',ccId:4,mileage:2100,fuel:'hybrid',type:'van',driverId:4,lastService:'2026-02-01',nextService:'2026-08-01',notes:'New acquisition'},
+    {id:8,make:'RAM',model:'1500',year:2023,plate:'VWX-9012',vin:'1HG008',fleet:'FL-008',status:'in_use',ccId:1,mileage:15600,fuel:'gasoline',type:'truck',driverId:5,lastService:'2025-12-15',nextService:'2026-06-15',notes:''},
+  ],
+  costCenters: [
+    {id:1,name:'Operations North',code:'OPS-N',desc:'Northern regional operations hub',active:true,budget:50000,spent:34200},
+    {id:2,name:'Logistics South',code:'LOG-S',desc:'Southern distribution and delivery',active:true,budget:40000,spent:28700},
+    {id:3,name:'Executive Fleet',code:'EXC-F',desc:'Senior management vehicles',active:true,budget:30000,spent:12400},
+    {id:4,name:'Field Services',code:'FLD-S',desc:'On-site technical field teams',active:true,budget:25000,spent:18900},
+    {id:5,name:'Archive Unit',code:'ARC-U',desc:'Decommissioned fleet pool',active:false,budget:0,spent:0},
+  ],
+  drivers: [
+    {id:1,name:'Ahmed Al-Rashid',license:'DL-44821',phone:'+966-50-111-2233',email:'ahmed@fleetops.sa',status:'active',vehicleId:1,joinDate:'2022-03-15',trips:142,color:'#4f8ef7'},
+    {id:2,name:'Sara Al-Malik',license:'DL-55932',phone:'+966-55-234-5678',email:'sara@fleetops.sa',status:'active',vehicleId:2,joinDate:'2021-07-01',trips:287,color:'#9b59b6'},
+    {id:3,name:'Omar Hassan',license:'DL-66043',phone:'+966-54-345-6789',email:'omar@fleetops.sa',status:'active',vehicleId:4,joinDate:'2023-01-10',trips:98,color:'#1abc9c'},
+    {id:4,name:'Fatima Khalid',license:'DL-77154',phone:'+966-56-456-7890',email:'fatima@fleetops.sa',status:'active',vehicleId:7,joinDate:'2024-02-20',trips:54,color:'#e74c3c'},
+    {id:5,name:'Khalid Al-Zahrani',license:'DL-88265',phone:'+966-58-567-8901',email:'khalid@fleetops.sa',status:'on_leave',vehicleId:8,joinDate:'2022-09-05',trips:211,color:'#f39c12'},
+    {id:6,name:'Nora Bin Laden',license:'DL-99376',phone:'+966-50-678-9012',email:'nora@fleetops.sa',status:'inactive',vehicleId:null,joinDate:'2020-11-30',trips:389,color:'#27ae60'},
+  ],
+  transfers: [
+    {id:1,vehicleId:2,fromCcId:1,toCcId:2,status:'completed',reason:'Project reassignment to southern hub',reqBy:'Ahmed Al-Rashid',approvedBy:'Hassan Zarroug',createdAt:'2026-04-01T09:00:00',completedAt:'2026-04-02T14:00:00'},
+    {id:2,vehicleId:4,fromCcId:3,toCcId:1,status:'pending',reason:'Maintenance rotation schedule',reqBy:'Hassan Zarroug',approvedBy:null,createdAt:'2026-04-03T14:30:00',completedAt:null},
+    {id:3,vehicleId:1,fromCcId:2,toCcId:3,status:'in_progress',reason:'Executive requirement — VIP visitors',reqBy:'Sara Al-Malik',approvedBy:'Hassan Zarroug',createdAt:'2026-04-04T11:00:00',completedAt:null},
+    {id:4,vehicleId:5,fromCcId:null,toCcId:2,status:'completed',reason:'New vehicle fleet assignment',reqBy:'Ahmed Al-Rashid',approvedBy:'Fatima Hassan',createdAt:'2026-03-28T08:00:00',completedAt:'2026-03-28T16:30:00'},
+    {id:5,vehicleId:3,fromCcId:1,toCcId:null,status:'cancelled',reason:'Vehicle sent to maintenance instead',reqBy:'Hassan Zarroug',approvedBy:null,createdAt:'2026-03-25T16:00:00',completedAt:null},
+    {id:6,vehicleId:7,fromCcId:null,toCcId:4,status:'completed',reason:'Initial assignment — new purchase',reqBy:'Hassan Zarroug',approvedBy:'Hassan Zarroug',createdAt:'2026-03-20T10:00:00',completedAt:'2026-03-20T11:00:00'},
+  ],
+  maintenance: [
+    {id:1,vehicleId:3,type:'Brake System Repair',status:'in_progress',priority:'high',scheduledDate:'2026-04-10',completedDate:null,technicianName:'Ali Hassan',estimatedCost:1200,actualCost:null,notes:'Full brake pad and rotor replacement'},
+    {id:2,vehicleId:6,type:'Engine Overhaul',status:'pending',priority:'critical',scheduledDate:'2026-04-15',completedDate:null,technicianName:'Mohammed Al-Ghamdi',estimatedCost:5500,actualCost:null,notes:'Major engine work required'},
+    {id:3,vehicleId:1,type:'Routine Service A',status:'scheduled',priority:'low',scheduledDate:'2026-06-01',completedDate:null,technicianName:'Ali Hassan',estimatedCost:350,actualCost:null,notes:'Oil change, filters, fluid top-up'},
+    {id:4,vehicleId:2,type:'Tyre Replacement',status:'scheduled',priority:'medium',scheduledDate:'2026-05-15',completedDate:null,technicianName:'Fahad Al-Qahtani',estimatedCost:900,actualCost:null,notes:'All 4 tyres — high wear'},
+    {id:5,vehicleId:8,type:'AC Service',status:'completed',priority:'low',scheduledDate:'2026-03-01',completedDate:'2026-03-01',technicianName:'Ali Hassan',estimatedCost:400,actualCost:380,notes:'AC regas and filter clean'},
+  ],
+  notifications: [
+    {id:1,title:'Maintenance Due Soon',msg:'FL-006 (Toyota Hilux) is overdue for service by 4 months.',type:'warning',read:false,time:'2026-04-07T08:00:00'},
+    {id:2,title:'Transfer Pending Approval',msg:'Transfer request for Nissan Patrol (FL-004) awaits your approval.',type:'info',read:false,time:'2026-04-06T14:30:00'},
+    {id:3,title:'Driver on Leave',msg:'Khalid Al-Zahrani is on leave — RAM 1500 (FL-008) may need reassignment.',type:'warning',read:false,time:'2026-04-05T10:00:00'},
+    {id:4,title:'Budget Alert',msg:'Operations North has used 68% of its monthly budget.',type:'warning',read:true,time:'2026-04-04T09:00:00'},
+    {id:5,title:'New Vehicle Added',msg:'Hyundai Staria (FL-007) has been registered in the system.',type:'success',read:true,time:'2026-03-20T10:00:00'},
+  ],
+  settings: {darkMode:true,notifications:true,autoApprove:false,emailAlerts:true,smsAlerts:false,currency:'SAR',distUnit:'km',companyName:'Fleet Ops SA'},
+};
+
+// Load or init state
+let S = (() => { try { const s = localStorage.getItem(STORAGE_KEY); return s ? JSON.parse(s) : JSON.parse(JSON.stringify(defaultData)); } catch(e) { return JSON.parse(JSON.stringify(defaultData)); }})();
+function save() { try { localStorage.setItem(STORAGE_KEY, JSON.stringify(S)); } catch(e){} updateBadges(); }
+
+// ═══════════════════════════════════════════════════════
+// HELPERS
+// ═══════════════════════════════════════════════════════
+const $ = id => document.getElementById(id);
+const ccName = id => { if(!id) return 'Unassigned'; const c = S.costCenters.find(x=>x.id===id); return c?c.name:'Unknown'; };
+const driverName = id => { if(!id) return 'Unassigned'; const d = S.drivers.find(x=>x.id===id); return d?d.name:'Unknown'; };
+const vLabel = id => { const v = S.vehicles.find(x=>x.id===id); return v?`${v.make} ${v.model} (${v.fleet})`:'Unknown'; };
+const timeAgo = d => { const s=(new Date()-new Date(d))/1000; if(s<60) return 'just now'; if(s<3600) return Math.round(s/60)+'m ago'; if(s<86400) return Math.round(s/3600)+'h ago'; return Math.round(s/86400)+'d ago'; };
+const fmtDate = d => d ? new Date(d).toLocaleDateString('en-GB',{day:'2-digit',month:'short',year:'numeric'}) : '—';
+const fmtCur = n => (S.settings.currency||'SAR')+' '+Number(n||0).toLocaleString();
+const nextId = arr => arr.length ? Math.max(...arr.map(x=>x.id))+1 : 1;
+
+function statusBadge(s) {
+  const m = {available:'badge-green Available',in_use:'badge-blue In Use',maintenance:'badge-amber Maintenance',out_of_service:'badge-red Out of Service',
+    completed:'badge-green Completed',in_progress:'badge-blue In Progress',pending:'badge-amber Pending',cancelled:'badge-red Cancelled',approved:'badge-green Approved',
+    active:'badge-green Active',on_leave:'badge-amber On Leave',inactive:'badge-gray Inactive',
+    high:'badge-amber High',critical:'badge-red Critical',low:'badge-gray Low',medium:'badge-blue Medium',
+    scheduled:'badge-blue Scheduled'};
+  const [cls,...lbl] = (m[s]||'badge-gray '+s).split(' ');
+  return `<span class="badge ${cls}">${lbl.join(' ')}</span>`;
+}
+
+function vIcon(type, size=18) {
+  const truck = `<svg width="${size}" height="${size}" viewBox="0 0 24 24" fill="currentColor"><path d="M20 8h-3V4H3c-1.1 0-2 .9-2 2v11h2c0 1.66 1.34 3 3 3s3-1.34 3-3h6c0 1.66 1.34 3 3 3s3-1.34 3-3h2v-5l-3-4z"/></svg>`;
+  const car = `<svg width="${size}" height="${size}" viewBox="0 0 24 24" fill="currentColor"><path d="M18.92 6.01C18.72 5.42 18.16 5 17.5 5h-11c-.66 0-1.21.42-1.42 1.01L3 12v8c0 .55.45 1 1 1h1c.55 0 1-.45 1-1v-1h12v1c0 .55.45 1 1 1h1c.55 0 1-.45 1-1v-8l-2.08-5.99zM6.5 16c-.83 0-1.5-.67-1.5-1.5S5.67 13 6.5 13s1.5.67 1.5 1.5S7.33 16 6.5 16zm11 0c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5zM5 11l1.5-4.5h11L19 11H5z"/></svg>`;
+  return (type==='truck'||type==='van')?truck:car;
+}
+
+function showToast(msg, type='success') {
+  const t = document.createElement('div');
+  t.className = `toast ${type}`;
+  const icon = type==='success'?'<svg viewBox="0 0 24 24" fill="var(--green)"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 14l-4-4 1.41-1.41L10 13.17l6.59-6.59L18 8l-8 8z"/></svg>':'<svg viewBox="0 0 24 24" fill="var(--red)"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z"/></svg>';
+  t.innerHTML = icon + msg;
+  $('toasts').appendChild(t);
+  setTimeout(()=>t.remove(), 3500);
+}
+
+function exportCSV(data, filename) {
+  if(!data.length){showToast('No data to export','error');return;}
+  const headers = Object.keys(data[0]);
+  const rows = data.map(r=>headers.map(h=>`"${String(r[h]||'').replace(/"/g,'""')}"`).join(','));
+  const csv = [headers.join(','),...rows].join('\n');
+  const a = document.createElement('a');
+  a.href = 'data:text/csv;charset=utf-8,'+encodeURIComponent(csv);
+  a.download = filename;
+  a.click();
+  showToast(`Exported ${data.length} records`);
+}
+
+function updateBadges() {
+  const pending = S.transfers.filter(t=>t.status==='pending').length;
+  const pb = $('pending-badge');
+  if(pb){ pb.textContent=pending; pb.style.display=pending?'':'none'; }
+  const maintDue = S.maintenance.filter(m=>m.status==='pending'||m.status==='in_progress').length;
+  const mb = $('maint-badge');
+  if(mb){ mb.textContent=maintDue; mb.style.display=maintDue?'':'none'; }
+  const unread = S.notifications.filter(n=>!n.read).length;
+  const nd = $('notif-dot');
+  if(nd) nd.style.display = unread?'':'none';
+}
+
+// ═══════════════════════════════════════════════════════
+// NAVIGATION
+// ═══════════════════════════════════════════════════════
+let currentPage = 'dashboard';
+let currentFilter = 'all';
+let searchQ = '';
+let modalMode = null;
+let editId = null;
+let activeCharts = [];
+
+function destroyCharts() {
+  activeCharts.forEach(c => { try { c.destroy(); } catch(e){} });
+  activeCharts = [];
+}
+
+function nav(page, el) {
+  destroyCharts();
+  currentPage = page;
+  currentFilter = 'all';
+  document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
+  if(el) el.classList.add('active');
+  const info = {
+    dashboard:{title:'Fleet Dashboard',sub:'Welcome back — here\'s your fleet overview'},
+    analytics:{title:'Analytics & Reports',sub:'Fleet performance metrics and trends'},
+    fleet:{title:'Fleet Management',sub:'Manage your vehicle inventory'},
+    transfers:{title:'Vehicle Transfers',sub:'Track and manage inter-cost-center transfers'},
+    maintenance:{title:'Maintenance Tracker',sub:'Schedule and monitor vehicle servicing'},
+    drivers:{title:'Driver Management',sub:'Manage licensed drivers and assignments'},
+    costcenters:{title:'Cost Centers',sub:'Manage organizational cost centers'},
+    settings:{title:'Settings',sub:'Configure your Fleet Ops platform'},
+  };
+  const p = info[page];
+  $('page-info').innerHTML = `<div class="page-title">${p.title}</div><div class="page-sub">${p.sub}</div>`;
+  const btnMap = {fleet:'Add Vehicle',transfers:'New Transfer',maintenance:'Schedule Maintenance',drivers:'Add Driver',costcenters:'Add Cost Center'};
+  const btn = $('main-btn');
+  if(btnMap[page]){btn.style.display='inline-flex';$('main-btn-lbl').textContent=btnMap[page];}
+  else btn.style.display='none';
+  render();
+}
+
+function doSearch(v) {
+  searchQ = v.toLowerCase();
+  if(['fleet','drivers','transfers'].includes(currentPage)) render();
+}
+
+// ═══════════════════════════════════════════════════════
+// RENDER ROUTER
+// ═══════════════════════════════════════════════════════
+function render() {
+  const c = $('page');
+  const fns = {dashboard:renderDashboard,analytics:renderAnalytics,fleet:renderFleet,transfers:renderTransfers,maintenance:renderMaintenance,drivers:renderDrivers,costcenters:renderCostCenters,settings:renderSettings};
+  c.innerHTML = (fns[currentPage]||renderDashboard)();
+  updateBadges();
+  setTimeout(()=>initCharts(), 50);
+}
+
+// ═══════════════════════════════════════════════════════
+// DASHBOARD
+// ═══════════════════════════════════════════════════════
+function renderDashboard() {
+  const v = S.vehicles;
+  const bySt = {available:0,in_use:0,maintenance:0,out_of_service:0};
+  v.forEach(x=>{if(bySt[x.status]!==undefined)bySt[x.status]++;});
+  const total = v.length;
+  const utilRate = total ? Math.round(((bySt.available+bySt.in_use)/total)*100) : 0;
+  const pending = S.transfers.filter(t=>t.status==='pending').length;
+  const maintDue = S.maintenance.filter(m=>m.status!=='completed').length;
+  const totalSpend = S.costCenters.reduce((a,c)=>a+(c.spent||0),0);
+
+  const recent5 = S.transfers.slice(0,5);
+  const upcomingMaint = S.maintenance.filter(m=>m.status!=='completed').slice(0,4);
+
+  return `
+  <div class="stats-row">
+    ${stat('Total Vehicles','#4f8ef7',vIcon('car',18),total,'+2 this month','up')}
+    ${stat('Active Fleet','#2ecc71','<svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 14l-4-4 1.41-1.41L10 13.17l6.59-6.59L18 8l-8 8z"/></svg>',bySt.available+bySt.in_use,'of '+total+' total','neutral')}
+    ${stat('Utilization','#9b59b6','<svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zM9 17H7v-7h2v7zm4 0h-2V7h2v10zm4 0h-2v-4h2v4z"/></svg>',utilRate+'%',utilRate>70?'above target':'below target',utilRate>70?'up':'down')}
+    ${stat('Pending Transfers','#f39c12','<svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M6.99 11L3 15l3.99 4v-3H14v-2H6.99v-3zM21 9l-3.99-4v3H10v2h7.01v3L21 9z"/></svg>',pending,'require approval',pending>0?'down':'up')}
+    ${stat('Total Fleet Spend','#1abc9c','<svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M11.8 10.9c-2.27-.59-3-1.2-3-2.15 0-1.09 1.01-1.85 2.7-1.85 1.78 0 2.44.85 2.5 2.1h2.21c-.07-1.72-1.12-3.3-3.21-3.81V3h-3v2.16c-1.94.42-3.5 1.68-3.5 3.61 0 2.31 1.91 3.46 4.7 4.13 2.5.6 3 1.48 3 2.41 0 .69-.49 1.79-2.7 1.79-2.06 0-2.87-.92-2.98-2.1h-2.2c.12 2.19 1.76 3.42 3.68 3.83V21h3v-2.15c1.95-.37 3.5-1.5 3.5-3.55 0-2.84-2.43-3.81-4.7-4.4z"/></svg>',fmtCur(totalSpend),'across all centers','neutral')}
+  </div>
+
+  <div class="g-main mb16">
+    <div class="card">
+      <div class="card-hd">
+        <div><div class="card-title">Recent Transfers</div></div>
+        <button class="btn btn-outline btn-sm" onclick="nav('transfers',document.querySelectorAll('.nav-item')[3])">View all →</button>
+      </div>
+      <div class="tbl-wrap">
+        ${recent5.length===0?emptyState('No transfers yet','Initiate a transfer to track movement'):
+        `<table class="tbl"><thead><tr><th>Vehicle</th><th>Route</th><th>Status</th><th>Requested by</th><th>When</th></tr></thead><tbody>
+        ${recent5.map(t=>{const v2=S.vehicles.find(x=>x.id===t.vehicleId);return`<tr>
+          <td><div class="inline-flex">${vIcon(v2?.type)}<div><div class="tbl-primary">${v2?v2.make+' '+v2.model:'Unknown'}</div><div class="tbl-sub mono">${v2?.fleet||'—'}</div></div></div></td>
+          <td><div class="route"><span>${ccName(t.fromCcId)}</span><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 4l-1.41 1.41L16.17 11H4v2h12.17l-5.58 5.59L12 20l8-8z"/></svg><span>${ccName(t.toCcId)}</span></div></td>
+          <td>${statusBadge(t.status)}</td>
+          <td class="text-muted">${t.reqBy}</td>
+          <td class="text-muted fs12">${timeAgo(t.createdAt)}</td>
+        </tr>`}).join('')}
+        </tbody></table>`}
+      </div>
+    </div>
+    <div class="stack">
+      <div class="card card-sm">
+        <div class="card-title mb16">Fleet Status</div>
+        <div style="display:flex;flex-direction:column;gap:10px">
+          ${[['available',bySt.available,'var(--green)'],['in_use',bySt.in_use,'var(--accent2)'],['maintenance',bySt.maintenance,'var(--amber)'],['out_of_service',bySt.out_of_service,'var(--red)']].map(([s,n,c])=>`
+          <div>
+            <div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:5px">
+              <span style="color:var(--text2)">${s.replace(/_/g,' ')}</span>
+              <span style="color:var(--text);font-weight:600;font-family:'DM Mono',monospace">${n} <span style="color:var(--text3);font-weight:400">(${total?Math.round(n/total*100):0}%)</span></span>
+            </div>
+            <div class="progress-bar" style="height:6px"><div class="progress-fill" style="width:${total?n/total*100:0}%;background:${c}"></div></div>
+          </div>`).join('')}
+        </div>
+      </div>
+      <div class="card card-sm">
+        <div class="card-title mb16">Upcoming Maintenance</div>
+        ${upcomingMaint.length===0?'<div class="text-muted fs12">No upcoming maintenance</div>':upcomingMaint.map(m=>{
+          const v2=S.vehicles.find(x=>x.id===m.vehicleId);
+          const pr={critical:'var(--red)',high:'var(--amber)',medium:'var(--accent2)',low:'var(--text3)'};
+          return`<div class="maint-item">
+            <div class="maint-icon" style="background:${pr[m.priority]||'var(--bg4)'}1a"><svg width="17" height="17" viewBox="0 0 24 24" fill="${pr[m.priority]||'var(--text3)'}"><path d="M22.7 19l-9.1-9.1c.9-2.3.4-5-1.5-6.9-2-2-5-2.4-7.4-1.3L9 6 6 9 1.6 4.7C.4 7.1.9 10.1 2.9 12.1c1.9 1.9 4.6 2.4 6.9 1.5l9.1 9.1c.4.4 1 .4 1.4 0l2.3-2.3c.5-.4.5-1.1.1-1.4z"/></svg></div>
+            <div class="maint-info"><div class="maint-name">${v2?v2.make+' '+v2.model:'Unknown'}</div><div class="maint-desc">${m.type}</div></div>
+            <div class="maint-date" style="color:${pr[m.priority]||'var(--text3)'}">${fmtDate(m.scheduledDate)}</div>
+          </div>`;
+        }).join('')}
+      </div>
+    </div>
+  </div>
+
+  <div class="g3">
+    <div class="card card-sm">
+      <div class="card-title mb16">Quick Actions</div>
+      ${[
+        ['Add Vehicle','fleet','<svg viewBox="0 0 24 24" fill="currentColor"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/></svg>'],
+        ['New Transfer','transfers','<svg viewBox="0 0 24 24" fill="currentColor"><path d="M6.99 11L3 15l3.99 4v-3H14v-2H6.99v-3zM21 9l-3.99-4v3H10v2h7.01v3L21 9z"/></svg>'],
+        ['Schedule Maintenance','maintenance','<svg viewBox="0 0 24 24" fill="currentColor"><path d="M22.7 19l-9.1-9.1c.9-2.3.4-5-1.5-6.9-2-2-5-2.4-7.4-1.3L9 6 6 9 1.6 4.7C.4 7.1.9 10.1 2.9 12.1c1.9 1.9 4.6 2.4 6.9 1.5l9.1 9.1c.4.4 1 .4 1.4 0l2.3-2.3c.5-.4.5-1.1.1-1.4z"/></svg>'],
+        ['Add Driver','drivers','<svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>'],
+        ['Cost Centers','costcenters','<svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 7V3H2v18h20V7H12z"/></svg>'],
+        ['Export Fleet CSV','export','<svg viewBox="0 0 24 24" fill="currentColor"><path d="M14 2H6c-1.1 0-2 .9-2 2v16c0 1.1.89 2 2 2h12c1.1 0 2-.9 2-2V8l-6-6zm4 18H6V4h7v5h5v11z"/></svg>'],
+      ].map(([lbl,page,icon])=>`<div style="display:flex;align-items:center;gap:10px;padding:9px 10px;border-radius:var(--rs);background:var(--bg3);border:1px solid var(--border);cursor:pointer;margin-bottom:6px;font-size:13px;color:var(--text2);transition:all .15s" onmouseover="this.style.borderColor='var(--border2)';this.style.color='var(--text)'" onmouseout="this.style.borderColor='var(--border)';this.style.color='var(--text2)'" onclick="${page==='export'?`exportCSV(S.vehicles,'fleet-export.csv')`:`nav('${page}',document.querySelectorAll('.nav-item')[${['dashboard','analytics','fleet','transfers','maintenance','drivers','costcenters','settings'].indexOf(page)}])`}">
+        <div style="width:28px;height:28px;background:var(--accent-bg);border-radius:7px;display:flex;align-items:center;justify-content:center;flex-shrink:0;color:var(--accent2)">${icon}</div>
+        <span>${lbl}</span>
+      </div>`).join('')}
+    </div>
+    <div class="card card-sm" style="grid-column:span 2">
+      <div class="card-hd"><div class="card-title">Cost Center Budget Overview</div></div>
+      ${S.costCenters.filter(c=>c.active).map(c=>{const pct=c.budget?Math.min(Math.round(c.spent/c.budget*100),100):0;const col=pct>85?'var(--red)':pct>65?'var(--amber)':'var(--green)';return`
+      <div style="margin-bottom:14px">
+        <div style="display:flex;justify-content:space-between;font-size:12.5px;margin-bottom:5px">
+          <span style="color:var(--text);font-weight:500">${c.name} <span class="tag">${c.code}</span></span>
+          <span style="color:${col};font-family:'DM Mono',monospace;font-weight:600">${pct}%</span>
+        </div>
+        <div class="progress-bar" style="height:6px"><div class="progress-fill" style="width:${pct}%;background:${col}"></div></div>
+        <div style="display:flex;justify-content:space-between;font-size:11px;color:var(--text3);margin-top:4px"><span>${fmtCur(c.spent)} spent</span><span>${fmtCur(c.budget)} budget</span></div>
+      </div>`;}).join('')}
+    </div>
+  </div>`;
+}
+
+function stat(lbl, color, icon, val, trend, dir) {
+  const arrow = dir==='up'?'↑':dir==='down'?'↓':'→';
+  return `<div class="stat">
+    <div class="stat-top">
+      <div class="stat-icon" style="background:${color}22">${icon.replace('fill="currentColor"',`fill="${color}"`)}</div>
+      <span class="stat-trend ${dir}">${arrow} ${trend}</span>
+    </div>
+    <div class="stat-label">${lbl}</div>
+    <div class="stat-value">${val}</div>
+  </div>`;
+}
+
+// ═══════════════════════════════════════════════════════
+// ANALYTICS
+// ═══════════════════════════════════════════════════════
+function renderAnalytics() {
+  const bySt = {available:0,in_use:0,maintenance:0,out_of_service:0};
+  S.vehicles.forEach(x=>{if(bySt[x.status]!==undefined)bySt[x.status]++;});
+  const byType = {};
+  S.vehicles.forEach(v=>{byType[v.type]=(byType[v.type]||0)+1;});
+  const byFuel = {};
+  S.vehicles.forEach(v=>{byFuel[v.fuel]=(byFuel[v.fuel]||0)+1;});
+  const totalMileage = S.vehicles.reduce((a,v)=>a+(v.mileage||0),0);
+  const avgMileage = S.vehicles.length ? Math.round(totalMileage/S.vehicles.length) : 0;
+  const maintCost = S.maintenance.reduce((a,m)=>a+(m.actualCost||m.estimatedCost||0),0);
+
+  return `
+  <div class="stats-row" style="grid-template-columns:repeat(4,1fr)">
+    ${stat('Total Mileage','#4f8ef7','<svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M13.49 5.48c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zm-3.6 13.9l1-4.4 2.1 2v6h2v-7.5l-2.1-2 .6-3c1.3 1.5 3.3 2.5 5.5 2.5v-2c-1.9 0-3.5-1-4.3-2.4l-1-1.6c-.4-.6-1-1-1.7-1-.3 0-.5.1-.8.1l-5.2 2.2v4.7h2v-3.4l1.8-.7-1.6 8.1-4.9-1-.4 2 7 1.4z"/></svg>',totalMileage.toLocaleString()+' km','across all vehicles','neutral')}
+    ${stat('Avg Mileage','#9b59b6','<svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"/></svg>',avgMileage.toLocaleString()+' km','per vehicle','neutral')}
+    ${stat('Maintenance Cost','#f39c12','<svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M11.8 10.9c-2.27-.59-3-1.2-3-2.15 0-1.09 1.01-1.85 2.7-1.85 1.78 0 2.44.85 2.5 2.1h2.21c-.07-1.72-1.12-3.3-3.21-3.81V3h-3v2.16c-1.94.42-3.5 1.68-3.5 3.61 0 2.31 1.91 3.46 4.7 4.13 2.5.6 3 1.48 3 2.41 0 .69-.49 1.79-2.7 1.79-2.06 0-2.87-.92-2.98-2.1h-2.2c.12 2.19 1.76 3.42 3.68 3.83V21h3v-2.15c1.95-.37 3.5-1.5 3.5-3.55 0-2.84-2.43-3.81-4.7-4.4z"/></svg>',fmtCur(maintCost),'estimated total','neutral')}
+    ${stat('Active Drivers','#2ecc71','<svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>',S.drivers.filter(d=>d.status==='active').length,'of '+S.drivers.length+' registered','neutral')}
+  </div>
+
+  <div class="g2 mb16">
+    <div class="card">
+      <div class="card-hd"><div class="card-title">Fleet Status Distribution</div><button class="btn btn-outline btn-sm" onclick="exportCSV(S.vehicles,'fleet.csv')">Export CSV</button></div>
+      <div class="donut-wrap"><canvas id="c-status" width="160" height="160" class="donut-canvas"></canvas>
+      <div class="donut-legend">
+        ${[['Available',bySt.available,'#2ecc71'],['In Use',bySt.in_use,'#4f8ef7'],['Maintenance',bySt.maintenance,'#f39c12'],['Out of Service',bySt.out_of_service,'#e74c3c']].map(([l,n,c])=>`
+        <div class="legend-row"><div class="legend-dot" style="background:${c}"></div><span class="legend-label">${l}</span><span class="legend-val">${n}</span></div>`).join('')}
+      </div></div>
+    </div>
+    <div class="card">
+      <div class="card-hd"><div class="card-title">Vehicle Type Mix</div></div>
+      <div class="donut-wrap"><canvas id="c-type" width="160" height="160" class="donut-canvas"></canvas>
+      <div class="donut-legend">
+        ${Object.entries(byType).map(([t,n],i)=>{const cols=['#4f8ef7','#9b59b6','#1abc9c','#f39c12'];return`<div class="legend-row"><div class="legend-dot" style="background:${cols[i%cols.length]}"></div><span class="legend-label">${t}</span><span class="legend-val">${n}</span></div>`}).join('')}
+      </div></div>
+    </div>
+  </div>
+
+  <div class="g2 mb16">
+    <div class="card">
+      <div class="card-hd"><div class="card-title">Mileage by Vehicle</div></div>
+      <div class="chart-wrap" style="height:200px"><canvas id="c-mileage"></canvas></div>
+    </div>
+    <div class="card">
+      <div class="card-hd"><div class="card-title">Fuel Type Distribution</div></div>
+      <div class="donut-wrap" style="margin-top:16px"><canvas id="c-fuel" width="160" height="160" class="donut-canvas"></canvas>
+      <div class="donut-legend">
+        ${Object.entries(byFuel).map(([t,n],i)=>{const cols=['#4f8ef7','#2ecc71','#9b59b6','#f39c12'];return`<div class="legend-row"><div class="legend-dot" style="background:${cols[i%cols.length]}"></div><span class="legend-label">${t}</span><span class="legend-val">${n}</span></div>`}).join('')}
+      </div></div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-hd"><div class="card-title">Cost Center Budget vs. Spend</div><button class="btn btn-outline btn-sm" onclick="exportCSV(S.costCenters,'budgets.csv')">Export</button></div>
+    <div class="chart-wrap" style="height:220px"><canvas id="c-budget"></canvas></div>
+  </div>`;
+}
+
+// ═══════════════════════════════════════════════════════
+// FLEET
+// ═══════════════════════════════════════════════════════
+function renderFleet() {
+  let list = S.vehicles.filter(v => {
+    if(currentFilter!=='all' && v.status!==currentFilter) return false;
+    if(searchQ && !`${v.make} ${v.model} ${v.plate} ${v.fleet}`.toLowerCase().includes(searchQ)) return false;
+    return true;
+  });
+
+  return `
+  <div class="filter-bar">
+    ${['all','available','in_use','maintenance','out_of_service'].map(f=>`<span class="filter-chip ${currentFilter===f?'active':''}" onclick="currentFilter='${f}';render()">${f==='all'?'All Vehicles':f.replace(/_/g,' ')}</span>`).join('')}
+    <div class="filter-right">
+      <button class="btn btn-outline btn-sm" onclick="exportCSV(S.vehicles,'fleet-export.csv')">
+        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M14 2H6c-1.1 0-2 .9-2 2v16c0 1.1.89 2 2 2h12c1.1 0 2-.9 2-2V8l-6-6zm4 18H6V4h7v5h5v11z"/></svg>
+        Export CSV
+      </button>
+    </div>
+  </div>
+  ${list.length===0?`<div class="card">${emptyState('No vehicles found','Try adjusting your filters or search terms')}</div>`:
+  `<div class="g3">${list.map(v=>{
+    const driver = S.drivers.find(d=>d.id===v.driverId);
+    const mPct = Math.min(Math.round((v.mileage||0)/100000*100),100);
+    const mCol = mPct>80?'var(--red)':mPct>60?'var(--amber)':'var(--accent)';
+    return `<div class="vcard">
+      <div class="vcard-top">
+        <div style="display:flex;align-items:center;gap:10px">
+          <div class="vcard-icon">${vIcon(v.type,20)}</div>
+          <div><div class="vcard-id">${v.make} ${v.model}</div><div class="vcard-fleet">${v.fleet}</div></div>
+        </div>
+        ${statusBadge(v.status)}
+      </div>
+      <div class="vcard-rows">
+        <div class="vcard-row"><span class="vcard-k">License</span><span class="vcard-v mono">${v.plate}</span></div>
+        <div class="vcard-row"><span class="vcard-k">Year</span><span class="vcard-v">${v.year}</span></div>
+        <div class="vcard-row"><span class="vcard-k">Cost Center</span><span class="vcard-v">${ccName(v.ccId)}</span></div>
+        <div class="vcard-row"><span class="vcard-k">Driver</span><span class="vcard-v">${driver?driver.name:'Unassigned'}</span></div>
+        <div class="vcard-row"><span class="vcard-k">Fuel</span><span class="vcard-v">${v.fuel||'—'}</span></div>
+        <div class="vcard-row"><span class="vcard-k">Mileage</span><span class="vcard-v" style="color:${mCol}">${(v.mileage||0).toLocaleString()} km</span></div>
+      </div>
+      <div class="mileage-bar"><div class="mileage-fill" style="width:${mPct}%;background:${mCol}"></div></div>
+      <div style="font-size:10.5px;color:var(--text3);margin-bottom:12px">Next service: ${fmtDate(v.nextService)}</div>
+      <div class="vcard-btns">
+        <div class="vcard-btn blue" onclick="openEditVehicle(${v.id})">Edit</div>
+        <div class="vcard-btn" onclick="openTransferForVehicle(${v.id})">Transfer</div>
+        <div class="vcard-btn red" onclick="delVehicle(${v.id})">Delete</div>
+      </div>
+    </div>`;
+  }).join('')}</div>`}`;
+}
+
+// ═══════════════════════════════════════════════════════
+// TRANSFERS
+// ═══════════════════════════════════════════════════════
+function renderTransfers() {
+  let list = S.transfers.filter(t => {
+    if(currentFilter!=='all' && t.status!==currentFilter) return false;
+    if(searchQ){const v=S.vehicles.find(x=>x.id===t.vehicleId);if(!`${v?.make||''} ${v?.model||''} ${v?.fleet||''} ${t.reqBy}`.toLowerCase().includes(searchQ))return false;}
+    return true;
+  });
+
+  return `
+  <div class="filter-bar">
+    ${['all','pending','in_progress','completed','cancelled'].map(f=>`<span class="filter-chip ${currentFilter===f?'active':''}" onclick="currentFilter='${f}';render()">${f==='all'?'All':f.replace(/_/g,' ')}</span>`).join('')}
+    <div class="filter-right">
+      <button class="btn btn-outline btn-sm" onclick="exportCSV(S.transfers,'transfers.csv')">Export CSV</button>
+    </div>
+  </div>
+  ${list.length===0?`<div class="card">${emptyState('No transfers found','Adjust filters or create a new transfer')}</div>`:
+  `<div style="display:flex;flex-direction:column;gap:10px">${list.map(t=>{
+    const v=S.vehicles.find(x=>x.id===t.vehicleId);
+    return`<div class="tcard">
+      <div class="tcard-top">
+        <div class="tcard-vehicle">
+          <div class="tcard-icon">${vIcon(v?.type)}</div>
+          <div><div class="tbl-primary">${vLabel(t.vehicleId)}</div>
+          <div class="route" style="margin-top:4px"><span>${ccName(t.fromCcId)}</span><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 4l-1.41 1.41L16.17 11H4v2h12.17l-5.58 5.59L12 20l8-8z"/></svg><span>${ccName(t.toCcId)}</span></div>
+          </div>
+        </div>
+        <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap">
+          ${statusBadge(t.status)}
+          ${t.status==='pending'?`<button class="btn btn-success btn-sm" onclick="approveTransfer(${t.id})">Approve</button><button class="btn btn-danger btn-sm" onclick="cancelTransfer(${t.id})">Cancel</button>`:''}
+          <span class="text-muted fs12">${timeAgo(t.createdAt)}</span>
+        </div>
+      </div>
+      ${t.reason?`<div style="font-size:12.5px;color:var(--text3);margin-bottom:8px"><b style="color:var(--text2)">Reason:</b> ${t.reason}</div>`:''}
+      <div class="tcard-meta">
+        <span>Requested by: <b style="color:var(--text2)">${t.reqBy}</b></span>
+        ${t.approvedBy?`<span>Approved by: <b style="color:var(--text2)">${t.approvedBy}</b></span>`:''}
+        ${t.completedAt?`<span>Completed: <b style="color:var(--text2)">${fmtDate(t.completedAt)}</b></span>`:''}
+      </div>
+    </div>`;
+  }).join('')}</div>`}`;
+}
+
+function approveTransfer(id) {
+  const t = S.transfers.find(x=>x.id===id);
+  if(!t) return;
+  t.status = 'completed';
+  t.approvedBy = 'Hassan Zarroug';
+  t.completedAt = new Date().toISOString();
+  const v = S.vehicles.find(x=>x.id===t.vehicleId);
+  if(v) v.ccId = t.toCcId;
+  save(); render(); showToast('Transfer approved and completed');
+}
+function cancelTransfer(id) {
+  if(!confirm('Cancel this transfer?')) return;
+  S.transfers.find(x=>x.id===id).status = 'cancelled';
+  save(); render(); showToast('Transfer cancelled');
+}
+
+// ═══════════════════════════════════════════════════════
+// MAINTENANCE
+// ═══════════════════════════════════════════════════════
+function renderMaintenance() {
+  const totalCost = S.maintenance.reduce((a,m)=>a+(m.actualCost||m.estimatedCost||0),0);
+  const done = S.maintenance.filter(m=>m.status==='completed').length;
+  let list = S.maintenance.filter(m=>{
+    if(currentFilter!=='all' && m.status!==currentFilter) return false;
+    return true;
+  });
+
+  return `
+  <div class="stats-row" style="grid-template-columns:repeat(4,1fr);margin-bottom:16px">
+    <div class="stat"><div class="stat-top"><div class="stat-icon" style="background:var(--accent-bg)"><svg width="18" height="18" viewBox="0 0 24 24" fill="var(--accent2)"><path d="M19.43 12.98c.04-.32.07-.64.07-.98s-.03-.66-.07-.98l2.11-1.65c.19-.15.24-.42.12-.64l-2-3.46c-.12-.22-.39-.3-.61-.22l-2.49 1c-.52-.4-1.08-.73-1.69-.98l-.38-2.65C14.46 2.18 14.25 2 14 2h-4c-.25 0-.46.18-.49.42l-.38 2.65c-.61.25-1.17.59-1.69.98l-2.49-1c-.23-.09-.49 0-.61.22l-2 3.46c-.13.22-.07.49.12.64l2.11 1.65c-.04.32-.07.65-.07.98s.03.66.07.98l-2.11 1.65c-.19.15-.24.42-.12.64l2 3.46c.12.22.39.3.61.22l2.49-1c.52.4 1.08.73 1.69.98l.38 2.65c.03.24.24.42.49.42h4c.25 0 .46-.18.49-.42l.38-2.65c.61-.25 1.17-.59 1.69-.98l2.49 1c.23.09.49 0 .61-.22l2-3.46c.12-.22.07-.49-.12-.64l-2.11-1.65zM12 15.5c-1.93 0-3.5-1.57-3.5-3.5s1.57-3.5 3.5-3.5 3.5 1.57 3.5 3.5-1.57 3.5-3.5 3.5z"/></svg></div><span class="stat-trend neutral">total jobs</span></div><div class="stat-label">Total Jobs</div><div class="stat-value">${S.maintenance.length}</div></div>
+    <div class="stat"><div class="stat-top"><div class="stat-icon" style="background:var(--green-bg)"><svg width="18" height="18" viewBox="0 0 24 24" fill="var(--green)"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 14l-4-4 1.41-1.41L10 13.17l6.59-6.59L18 8l-8 8z"/></svg></div><span class="stat-trend up">completed</span></div><div class="stat-label">Completed</div><div class="stat-value">${done}</div></div>
+    <div class="stat"><div class="stat-top"><div class="stat-icon" style="background:var(--amber-bg)"><svg width="18" height="18" viewBox="0 0 24 24" fill="var(--amber)"><path d="M1 21h22L12 2 1 21zm12-3h-2v-2h2v2zm0-4h-2v-4h2v4z"/></svg></div><span class="stat-trend down">open</span></div><div class="stat-label">Open Jobs</div><div class="stat-value">${S.maintenance.length-done}</div></div>
+    <div class="stat"><div class="stat-top"><div class="stat-icon" style="background:var(--purple-bg)"><svg width="18" height="18" viewBox="0 0 24 24" fill="var(--purple2)"><path d="M11.8 10.9c-2.27-.59-3-1.2-3-2.15 0-1.09 1.01-1.85 2.7-1.85 1.78 0 2.44.85 2.5 2.1h2.21c-.07-1.72-1.12-3.3-3.21-3.81V3h-3v2.16c-1.94.42-3.5 1.68-3.5 3.61 0 2.31 1.91 3.46 4.7 4.13 2.5.6 3 1.48 3 2.41 0 .69-.49 1.79-2.7 1.79-2.06 0-2.87-.92-2.98-2.1h-2.2c.12 2.19 1.76 3.42 3.68 3.83V21h3v-2.15c1.95-.37 3.5-1.5 3.5-3.55 0-2.84-2.43-3.81-4.7-4.4z"/></svg></div><span class="stat-trend neutral">est.</span></div><div class="stat-label">Total Cost</div><div class="stat-value" style="font-size:16px">${fmtCur(totalCost)}</div></div>
+  </div>
+
+  <div class="filter-bar">
+    ${['all','pending','in_progress','scheduled','completed'].map(f=>`<span class="filter-chip ${currentFilter===f?'active':''}" onclick="currentFilter='${f}';render()">${f==='all'?'All':f.replace(/_/g,' ')}</span>`).join('')}
+  </div>
+
+  <div class="card">
+    <div class="tbl-wrap">
+      <table class="tbl"><thead><tr><th>Vehicle</th><th>Job Type</th><th>Priority</th><th>Status</th><th>Scheduled</th><th>Technician</th><th>Est. Cost</th><th>Actions</th></tr></thead>
+      <tbody>${list.map(m=>{const v=S.vehicles.find(x=>x.id===m.vehicleId);return`<tr>
+        <td><div class="tbl-primary">${v?v.make+' '+v.model:'Unknown'}</div><div class="tbl-sub mono">${v?.fleet||'—'}</div></td>
+        <td>${m.type}</td>
+        <td>${statusBadge(m.priority)}</td>
+        <td>${statusBadge(m.status)}</td>
+        <td class="text-muted">${fmtDate(m.scheduledDate)}</td>
+        <td class="text-muted">${m.technicianName||'—'}</td>
+        <td class="mono">${fmtCur(m.estimatedCost)}</td>
+        <td>
+          <div style="display:flex;gap:6px">
+            ${m.status!=='completed'?`<button class="btn btn-success btn-sm" onclick="completeMaint(${m.id})">Complete</button>`:''}
+            <button class="btn btn-danger btn-sm" onclick="delMaint(${m.id})">Delete</button>
+          </div>
+        </td>
+      </tr>`}).join('')}</tbody></table>
+    </div>
+  </div>`;
+}
+
+function completeMaint(id) {
+  const m = S.maintenance.find(x=>x.id===id);
+  if(!m) return;
+  m.status = 'completed';
+  m.completedDate = new Date().toISOString().split('T')[0];
+  m.actualCost = m.estimatedCost;
+  const v = S.vehicles.find(x=>x.id===m.vehicleId);
+  if(v) { v.lastService = m.completedDate; if(v.status==='maintenance') v.status='available'; }
+  save(); render(); showToast('Maintenance marked complete');
+}
+function delMaint(id) {
+  if(!confirm('Delete this maintenance record?')) return;
+  S.maintenance = S.maintenance.filter(x=>x.id!==id);
+  save(); render(); showToast('Record deleted');
+}
+
+// ═══════════════════════════════════════════════════════
+// DRIVERS
+// ═══════════════════════════════════════════════════════
+function renderDrivers() {
+  let list = S.drivers.filter(d=>{
+    if(currentFilter!=='all' && d.status!==currentFilter) return false;
+    if(searchQ && !`${d.name} ${d.license} ${d.email}`.toLowerCase().includes(searchQ)) return false;
+    return true;
+  });
+
+  return `
+  <div class="filter-bar">
+    ${['all','active','on_leave','inactive'].map(f=>`<span class="filter-chip ${currentFilter===f?'active':''}" onclick="currentFilter='${f}';render()">${f==='all'?'All Drivers':f.replace(/_/g,' ')}</span>`).join('')}
+    <div class="filter-right"><button class="btn btn-outline btn-sm" onclick="exportCSV(S.drivers,'drivers.csv')">Export CSV</button></div>
+  </div>
+  ${list.length===0?`<div class="card">${emptyState('No drivers found','Add a driver to get started')}</div>`:
+  `<div class="g3">${list.map(d=>{
+    const v=S.vehicles.find(x=>x.id===d.vehicleId);
+    return `<div class="dcard">
+      <div class="dcard-top">
+        <div class="dav" style="background:${d.color}">${d.name.split(' ').map(w=>w[0]).join('').slice(0,2)}</div>
+        <div><div class="dcard-name">${d.name}</div><div class="dcard-id">${d.license}</div></div>
+        ${statusBadge(d.status)}
+      </div>
+      <div class="dcard-rows">
+        <div class="vcard-row"><span class="vcard-k">Phone</span><span class="vcard-v">${d.phone}</span></div>
+        <div class="vcard-row"><span class="vcard-k">Email</span><span class="vcard-v" style="font-size:11px">${d.email}</span></div>
+        <div class="vcard-row"><span class="vcard-k">Assigned Vehicle</span><span class="vcard-v">${v?v.fleet+' '+v.make+' '+v.model:'Unassigned'}</span></div>
+        <div class="vcard-row"><span class="vcard-k">Joined</span><span class="vcard-v">${fmtDate(d.joinDate)}</span></div>
+        <div class="vcard-row"><span class="vcard-k">Total Trips</span><span class="vcard-v mono">${d.trips}</span></div>
+      </div>
+      <div class="vcard-btns">
+        <div class="vcard-btn blue" onclick="openEditDriver(${d.id})">Edit</div>
+        <div class="vcard-btn red" onclick="delDriver(${d.id})">Remove</div>
+      </div>
+    </div>`;
+  }).join('')}</div>`}`;
+}
+
+function delDriver(id) {
+  if(!confirm('Remove this driver?')) return;
+  S.vehicles.filter(v=>v.driverId===id).forEach(v=>v.driverId=null);
+  S.drivers = S.drivers.filter(x=>x.id!==id);
+  save(); render(); showToast('Driver removed');
+}
+
+// ═══════════════════════════════════════════════════════
+// COST CENTERS
+// ═══════════════════════════════════════════════════════
+function renderCostCenters() {
+  const list = S.costCenters;
+  const vCount = id => S.vehicles.filter(v=>v.ccId===id).length;
+  return `
+  <div class="g3">
+    ${list.map(cc=>{
+      const pct = cc.budget ? Math.min(Math.round(cc.spent/cc.budget*100),100) : 0;
+      const col = pct>85?'var(--red)':pct>65?'var(--amber)':'var(--green)';
+      return`<div class="card card-sm" style="transition:border-color .2s" onmouseover="this.style.borderColor='var(--border2)'" onmouseout="this.style.borderColor='var(--border)'">
+        <div class="card-hd" style="margin-bottom:12px">
+          <div style="display:flex;align-items:center;gap:10px">
+            <div style="width:38px;height:38px;background:var(--accent-bg);border-radius:10px;display:flex;align-items:center;justify-content:center">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="var(--accent2)"><path d="M12 7V3H2v18h20V7H12z"/></svg>
+            </div>
+            <div><div class="tbl-primary">${cc.name}</div><div class="tbl-sub mono">${cc.code}</div></div>
+          </div>
+          ${statusBadge(cc.active?'active':'inactive')}
+        </div>
+        ${cc.desc?`<div class="fs12 text-muted mb16" style="line-height:1.5">${cc.desc}</div>`:''}
+        <div class="vcard-rows">
+          <div class="vcard-row"><span class="vcard-k">Vehicles</span><span class="vcard-v">${vCount(cc.id)}</span></div>
+          <div class="vcard-row"><span class="vcard-k">Budget</span><span class="vcard-v mono">${fmtCur(cc.budget)}</span></div>
+          <div class="vcard-row"><span class="vcard-k">Spent</span><span class="vcard-v mono" style="color:${col}">${fmtCur(cc.spent)}</span></div>
+        </div>
+        ${cc.budget?`<div class="progress-bar mt10 mb16" style="height:5px"><div class="progress-fill" style="width:${pct}%;background:${col}"></div></div><div class="fs11 text-muted">${pct}% of budget used</div>`:''}
+        <div style="margin-top:12px" class="vcard-btns">
+          <div class="vcard-btn blue" onclick="openEditCC(${cc.id})">Edit</div>
+          <div class="vcard-btn red" onclick="delCC(${cc.id})">Delete</div>
+        </div>
+      </div>`;
+    }).join('')}
+  </div>`;
+}
+
+function delCC(id) {
+  if(S.vehicles.some(v=>v.ccId===id)){showToast('Cannot delete — vehicles are assigned to this cost center','error');return;}
+  if(!confirm('Delete this cost center?')) return;
+  S.costCenters = S.costCenters.filter(x=>x.id!==id);
+  save(); render(); showToast('Cost center deleted');
+}
+
+// ═══════════════════════════════════════════════════════
+// SETTINGS
+// ═══════════════════════════════════════════════════════
+function renderSettings() {
+  const tog = (key,lbl,sub) => `<div class="settings-row" style="display:flex;justify-content:space-between;align-items:center;padding:12px 0;border-bottom:1px solid var(--border)">
+    <div><div style="font-size:13.5px;font-weight:500;color:var(--text)">${lbl}</div><div class="fs12 text-muted" style="margin-top:2px">${sub}</div></div>
+    <div style="width:40px;height:23px;background:${S.settings[key]?'var(--accent)':'var(--border2)'};border-radius:100px;position:relative;cursor:pointer;transition:background .2s;flex-shrink:0" onclick="S.settings['${key}']=!S.settings['${key}'];save();render()">
+      <div style="width:17px;height:17px;background:white;border-radius:50%;position:absolute;top:3px;left:${S.settings[key]?'20':'3'}px;transition:left .2s"></div>
+    </div>
+  </div>`;
+
+  return `
+  <div class="g2">
+    <div>
+      <div class="card mb16">
+        <div class="card-title mb16">General Preferences</div>
+        ${tog('darkMode','Dark Mode','Use dark theme across the platform')}
+        ${tog('notifications','Notifications','Enable in-app notifications and alerts')}
+        ${tog('autoApprove','Auto-Approve Transfers','Automatically approve low-priority transfers')}
+        <div style="border-bottom:none;padding-top:12px"></div>
+        <div class="form-row"><label class="form-label">Company Name</label><input class="form-input" value="${S.settings.companyName||'Fleet Ops'}" oninput="S.settings.companyName=this.value;save()"/></div>
+        <div class="fg2">
+          <div class="form-row"><label class="form-label">Currency</label><select class="form-input" onchange="S.settings.currency=this.value;save()"><option ${S.settings.currency==='SAR'?'selected':''}>SAR</option><option ${S.settings.currency==='USD'?'selected':''}>USD</option><option ${S.settings.currency==='AED'?'selected':''}>AED</option><option ${S.settings.currency==='EUR'?'selected':''}>EUR</option></select></div>
+          <div class="form-row"><label class="form-label">Distance Unit</label><select class="form-input" onchange="S.settings.distUnit=this.value;save()"><option value="km" ${S.settings.distUnit==='km'?'selected':''}>Kilometers (km)</option><option value="mi" ${S.settings.distUnit==='mi'?'selected':''}>Miles (mi)</option></select></div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-title mb16">Alert Settings</div>
+        ${tog('emailAlerts','Email Alerts','Receive operational alerts via email')}
+        ${tog('smsAlerts','SMS Alerts','Receive critical alerts via SMS')}
+      </div>
+    </div>
+    <div>
+      <div class="card mb16">
+        <div class="card-title mb16">System Information</div>
+        ${[['Platform','Fleet Ops Pro v3.0'],['Build Date','April 2026'],['Database','PostgreSQL (Connected)'],['Storage','1.4 GB / 50 GB'],['Last Sync','Just now'],['Vehicles',''+S.vehicles.length],['Drivers',''+S.drivers.length],['Transfers',''+S.transfers.length]].map(([k,v])=>`<div style="display:flex;justify-content:space-between;padding:10px 0;border-bottom:1px solid var(--border);font-size:13px"><span class="text-muted">${k}</span><span style="color:var(--text);font-weight:500">${v}</span></div>`).join('')}
+      </div>
+      <div class="card">
+        <div class="card-title mb16">Danger Zone</div>
+        <div class="fs12 text-muted mb16">These actions are irreversible. Proceed with caution.</div>
+        <button class="btn btn-danger w100" style="margin-bottom:8px;justify-content:center" onclick="if(confirm('Reset all data to defaults?')){localStorage.removeItem('${STORAGE_KEY}');location.reload();}">Reset to Default Data</button>
+        <button class="btn btn-outline w100" style="justify-content:center" onclick="exportCSV([...S.vehicles,...S.transfers,...S.maintenance],'full-export.csv')">Export All Data</button>
+      </div>
+    </div>
+  </div>`;
+}
+
+// ═══════════════════════════════════════════════════════
+// NOTIFICATIONS
+// ═══════════════════════════════════════════════════════
+function toggleNotifs() {
+  const p = $('notif-panel');
+  p.classList.toggle('open');
+  if(p.classList.contains('open')) renderNotifs();
+}
+function renderNotifs() {
+  const iconMap = {warning:'var(--amber)',info:'var(--accent2)',success:'var(--green)',error:'var(--red)'};
+  $('notif-list').innerHTML = S.notifications.map(n=>`
+  <div class="notif-item ${n.read?'':'unread'}" onclick="S.notifications.find(x=>x.id===${n.id}).read=true;save();renderNotifs();updateBadges()">
+    <div class="notif-icon" style="background:${iconMap[n.type]||'var(--accent2)'}22">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="${iconMap[n.type]||'var(--accent2)'}"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"/></svg>
+    </div>
+    <div>
+      <div class="notif-title">${n.title}</div>
+      <div class="notif-msg">${n.msg}</div>
+      <div class="notif-time">${timeAgo(n.time)}</div>
+    </div>
+  </div>`).join('');
+}
+function markAllRead() {
+  S.notifications.forEach(n=>n.read=true);
+  save(); renderNotifs(); updateBadges();
+}
+
+// ═══════════════════════════════════════════════════════
+// MODALS
+// ═══════════════════════════════════════════════════════
+function openMainModal() {
+  const m = {fleet:openVehicleModal,transfers:openTransferModal,maintenance:openMaintModal,drivers:openDriverModal,costcenters:openCCModal};
+  (m[currentPage]||openVehicleModal)();
+}
+function showModal(title, body, submitLbl='Save') {
+  $('modal-title').textContent = title;
+  $('modal-body').innerHTML = body;
+  $('modal-submit').textContent = submitLbl;
+  $('modal').classList.add('open');
+}
+function closeModal() { $('modal').classList.remove('open'); modalMode=null; editId=null; }
+
+// Vehicle Modal
+function openVehicleModal() { modalMode='vehicle'; editId=null; showModal('Add New Vehicle', vehicleForm()); }
+function openEditVehicle(id) { modalMode='vehicle'; editId=id; showModal('Edit Vehicle', vehicleForm(S.vehicles.find(x=>x.id===id))); }
+function vehicleForm(v) {
+  const ccOpts = S.costCenters.map(c=>`<option value="${c.id}" ${v?.ccId===c.id?'selected':''}>${c.name}</option>`).join('');
+  const drOpts = S.drivers.map(d=>`<option value="${d.id}" ${v?.driverId===d.id?'selected':''}>${d.name}</option>`).join('');
+  return `
+  <div class="form-section">Vehicle Identity</div>
+  <div class="fg2">
+    <div class="form-row"><label class="form-label">Make <span class="req">*</span></label><input class="form-input" id="v-make" value="${v?.make||''}" placeholder="Toyota"/></div>
+    <div class="form-row"><label class="form-label">Model <span class="req">*</span></label><input class="form-input" id="v-model" value="${v?.model||''}" placeholder="Land Cruiser"/></div>
+  </div>
+  <div class="fg3">
+    <div class="form-row"><label class="form-label">Year</label><input class="form-input" id="v-year" type="number" value="${v?.year||2024}"/></div>
+    <div class="form-row"><label class="form-label">License Plate <span class="req">*</span></label><input class="form-input" id="v-plate" value="${v?.plate||''}" placeholder="ABC-1234"/></div>
+    <div class="form-row"><label class="form-label">Fleet # <span class="req">*</span></label><input class="form-input" id="v-fleet" value="${v?.fleet||''}" placeholder="FL-001"/></div>
+  </div>
+  <div class="form-row"><label class="form-label">VIN</label><input class="form-input" id="v-vin" value="${v?.vin||''}" placeholder="Vehicle Identification Number"/></div>
+  <div class="form-section">Classification</div>
+  <div class="fg2">
+    <div class="form-row"><label class="form-label">Status</label><select class="form-input" id="v-status"><option value="available" ${v?.status==='available'?'selected':''}>Available</option><option value="in_use" ${v?.status==='in_use'?'selected':''}>In Use</option><option value="maintenance" ${v?.status==='maintenance'?'selected':''}>Maintenance</option><option value="out_of_service" ${v?.status==='out_of_service'?'selected':''}>Out of Service</option></select></div>
+    <div class="form-row"><label class="form-label">Type</label><select class="form-input" id="v-type"><option value="car" ${v?.type==='car'?'selected':''}>Car</option><option value="suv" ${v?.type==='suv'?'selected':''}>SUV</option><option value="truck" ${v?.type==='truck'?'selected':''}>Truck</option><option value="van" ${v?.type==='van'?'selected':''}>Van</option></select></div>
+  </div>
+  <div class="fg2">
+    <div class="form-row"><label class="form-label">Fuel Type</label><select class="form-input" id="v-fuel"><option value="diesel" ${v?.fuel==='diesel'?'selected':''}>Diesel</option><option value="gasoline" ${v?.fuel==='gasoline'?'selected':''}>Gasoline</option><option value="electric" ${v?.fuel==='electric'?'selected':''}>Electric</option><option value="hybrid" ${v?.fuel==='hybrid'?'selected':''}>Hybrid</option></select></div>
+    <div class="form-row"><label class="form-label">Mileage (km)</label><input class="form-input" id="v-mileage" type="number" value="${v?.mileage||0}"/></div>
+  </div>
+  <div class="form-section">Assignment</div>
+  <div class="fg2">
+    <div class="form-row"><label class="form-label">Cost Center</label><select class="form-input" id="v-cc"><option value="">Unassigned</option>${ccOpts}</select></div>
+    <div class="form-row"><label class="form-label">Driver</label><select class="form-input" id="v-driver"><option value="">Unassigned</option>${drOpts}</select></div>
+  </div>
+  <div class="fg2">
+    <div class="form-row"><label class="form-label">Last Service Date</label><input class="form-input" id="v-lastsvc" type="date" value="${v?.lastService||''}"/></div>
+    <div class="form-row"><label class="form-label">Next Service Date</label><input class="form-input" id="v-nextsvc" type="date" value="${v?.nextService||''}"/></div>
+  </div>
+  <div class="form-row"><label class="form-label">Notes</label><textarea class="form-input" id="v-notes" placeholder="Optional notes...">${v?.notes||''}</textarea></div>`;
+}
+
+// Transfer Modal
+function openTransferModal() { modalMode='transfer'; editId=null; showModal('Initiate Vehicle Transfer', transferForm()); }
+function openTransferForVehicle(vid) { modalMode='transfer'; editId=null; showModal('Transfer Vehicle', transferForm(vid)); }
+function transferForm(preVid) {
+  const vOpts = S.vehicles.map(v=>`<option value="${v.id}" ${preVid===v.id?'selected':''}>${v.make} ${v.model} — ${v.fleet}</option>`).join('');
+  const ccOpts = S.costCenters.filter(c=>c.active).map(c=>`<option value="${c.id}">${c.name} (${c.code})</option>`).join('');
+  return `
+  <div class="form-row"><label class="form-label">Vehicle <span class="req">*</span></label><select class="form-input" id="t-vehicle"><option value="">Select vehicle...</option>${vOpts}</select></div>
+  <div class="fg2">
+    <div class="form-row"><label class="form-label">From Cost Center</label><select class="form-input" id="t-from"><option value="">Unassigned / Pool</option>${ccOpts}</select></div>
+    <div class="form-row"><label class="form-label">To Cost Center <span class="req">*</span></label><select class="form-input" id="t-to"><option value="">Select destination...</option>${ccOpts}</select></div>
+  </div>
+  <div class="form-row"><label class="form-label">Reason for Transfer</label><textarea class="form-input" id="t-reason" placeholder="Describe the reason for this transfer..."></textarea></div>
+  <div class="form-row"><label class="form-label">Requested By</label><input class="form-input" id="t-by" value="Hassan Zarroug"/></div>`;
+}
+
+// Maintenance Modal
+function openMaintModal() { modalMode='maintenance'; editId=null; showModal('Schedule Maintenance', maintForm()); }
+function maintForm() {
+  const vOpts = S.vehicles.map(v=>`<option value="${v.id}">${v.make} ${v.model} — ${v.fleet}</option>`).join('');
+  return `
+  <div class="form-row"><label class="form-label">Vehicle <span class="req">*</span></label><select class="form-input" id="m-vehicle"><option value="">Select vehicle...</option>${vOpts}</select></div>
+  <div class="form-row"><label class="form-label">Job Type <span class="req">*</span></label><input class="form-input" id="m-type" placeholder="e.g. Oil Change, Tyre Replacement..."/></div>
+  <div class="fg2">
+    <div class="form-row"><label class="form-label">Priority</label><select class="form-input" id="m-priority"><option value="low">Low</option><option value="medium">Medium</option><option value="high">High</option><option value="critical">Critical</option></select></div>
+    <div class="form-row"><label class="form-label">Scheduled Date <span class="req">*</span></label><input class="form-input" id="m-date" type="date" value="${new Date().toISOString().split('T')[0]}"/></div>
+  </div>
+  <div class="fg2">
+    <div class="form-row"><label class="form-label">Technician Name</label><input class="form-input" id="m-tech" placeholder="Technician..."/></div>
+    <div class="form-row"><label class="form-label">Estimated Cost (${S.settings.currency||'SAR'})</label><input class="form-input" id="m-cost" type="number" placeholder="0"/></div>
+  </div>
+  <div class="form-row"><label class="form-label">Notes</label><textarea class="form-input" id="m-notes" placeholder="Additional notes..."></textarea></div>`;
+}
+
+// Driver Modal
+function openDriverModal() { modalMode='driver'; editId=null; showModal('Add Driver', driverForm()); }
+function openEditDriver(id) { modalMode='driver'; editId=id; showModal('Edit Driver', driverForm(S.drivers.find(x=>x.id===id))); }
+function driverForm(d) {
+  const vOpts = S.vehicles.map(v=>`<option value="${v.id}" ${d?.vehicleId===v.id?'selected':''}>${v.make} ${v.model} — ${v.fleet}</option>`).join('');
+  const colors = ['#4f8ef7','#9b59b6','#1abc9c','#e74c3c','#f39c12','#27ae60','#e91e63','#ff5722'];
+  return `
+  <div class="fg2">
+    <div class="form-row"><label class="form-label">Full Name <span class="req">*</span></label><input class="form-input" id="d-name" value="${d?.name||''}" placeholder="Ahmed Al-Rashid"/></div>
+    <div class="form-row"><label class="form-label">License # <span class="req">*</span></label><input class="form-input" id="d-lic" value="${d?.license||''}" placeholder="DL-12345"/></div>
+  </div>
+  <div class="fg2">
+    <div class="form-row"><label class="form-label">Phone</label><input class="form-input" id="d-phone" value="${d?.phone||''}" placeholder="+966-50-000-0000"/></div>
+    <div class="form-row"><label class="form-label">Email</label><input class="form-input" id="d-email" value="${d?.email||''}" placeholder="driver@fleetops.sa"/></div>
+  </div>
+  <div class="fg2">
+    <div class="form-row"><label class="form-label">Status</label><select class="form-input" id="d-status"><option value="active" ${d?.status==='active'?'selected':''}>Active</option><option value="on_leave" ${d?.status==='on_leave'?'selected':''}>On Leave</option><option value="inactive" ${d?.status==='inactive'?'selected':''}>Inactive</option></select></div>
+    <div class="form-row"><label class="form-label">Assigned Vehicle</label><select class="form-input" id="d-vehicle"><option value="">Unassigned</option>${vOpts}</select></div>
+  </div>
+  <div class="form-row"><label class="form-label">Join Date</label><input class="form-input" id="d-join" type="date" value="${d?.joinDate||new Date().toISOString().split('T')[0]}"/></div>
+  <div class="form-row"><label class="form-label">Avatar Color</label><div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:4px">${colors.map(c=>`<div onclick="this.parentElement.querySelectorAll('div').forEach(x=>x.style.outline='none');this.style.outline='2px solid white';document.getElementById('d-color').value='${c}'" style="width:28px;height:28px;background:${c};border-radius:50%;cursor:pointer;outline:${(d?.color||colors[0])===c?'2px solid white':'none'}"></div>`).join('')}<input type="hidden" id="d-color" value="${d?.color||colors[0]}"/></div></div>`;
+}
+
+// Cost Center Modal
+function openCCModal() { modalMode='costcenter'; editId=null; showModal('Add Cost Center', ccForm()); }
+function openEditCC(id) { modalMode='costcenter'; editId=id; showModal('Edit Cost Center', ccForm(S.costCenters.find(x=>x.id===id))); }
+function ccForm(cc) {
+  return `
+  <div class="fg2">
+    <div class="form-row"><label class="form-label">Name <span class="req">*</span></label><input class="form-input" id="cc-name" value="${cc?.name||''}" placeholder="Operations North"/></div>
+    <div class="form-row"><label class="form-label">Code <span class="req">*</span></label><input class="form-input" id="cc-code" value="${cc?.code||''}" placeholder="OPS-N"/></div>
+  </div>
+  <div class="form-row"><label class="form-label">Description</label><textarea class="form-input" id="cc-desc" placeholder="Optional description...">${cc?.desc||''}</textarea></div>
+  <div class="fg2">
+    <div class="form-row"><label class="form-label">Annual Budget (${S.settings.currency||'SAR'})</label><input class="form-input" id="cc-budget" type="number" value="${cc?.budget||0}"/></div>
+    <div class="form-row"><label class="form-label">Current Spend</label><input class="form-input" id="cc-spent" type="number" value="${cc?.spent||0}"/></div>
+  </div>
+  <div class="form-row"><label class="checkbox-row"><input type="checkbox" id="cc-active" ${cc?.active!==false?'checked':''}><label for="cc-active">Active cost center</label></label></div>`;
+}
+
+// Submit modal
+function submitModal() {
+  const fv = id => $(id)?.value?.trim()||'';
+  const fn = id => parseFloat($(id)?.value)||0;
+  const fi = id => parseInt($(id)?.value)||null;
+
+  if(modalMode==='vehicle') {
+    if(!fv('v-make')||!fv('v-model')||!fv('v-plate')||!fv('v-fleet')){showToast('Please fill required fields','error');return;}
+    const d = {make:fv('v-make'),model:fv('v-model'),year:fi('v-year')||2024,plate:fv('v-plate'),vin:fv('v-vin')||'VIN'+Date.now(),fleet:fv('v-fleet'),status:fv('v-status')||'available',ccId:fi('v-cc'),mileage:fn('v-mileage'),fuel:fv('v-fuel'),type:fv('v-type'),driverId:fi('v-driver'),lastService:fv('v-lastsvc'),nextService:fv('v-nextsvc'),notes:fv('v-notes')};
+    if(editId) Object.assign(S.vehicles.find(x=>x.id===editId),d);
+    else{d.id=nextId(S.vehicles);S.vehicles.push(d);}
+    showToast(editId?'Vehicle updated':'Vehicle added');
+
+  } else if(modalMode==='transfer') {
+    if(!fi('t-vehicle')||!fi('t-to')){showToast('Please select vehicle and destination','error');return;}
+    const d = {vehicleId:fi('t-vehicle'),fromCcId:fi('t-from'),toCcId:fi('t-to'),status:'pending',reason:fv('t-reason'),reqBy:fv('t-by')||'Fleet Manager',approvedBy:null,createdAt:new Date().toISOString(),completedAt:null};
+    d.id=nextId(S.transfers);S.transfers.unshift(d);
+    showToast('Transfer request created');
+
+  } else if(modalMode==='maintenance') {
+    if(!fi('m-vehicle')||!fv('m-type')||!fv('m-date')){showToast('Please fill required fields','error');return;}
+    const d = {vehicleId:fi('m-vehicle'),type:fv('m-type'),status:'scheduled',priority:fv('m-priority')||'medium',scheduledDate:fv('m-date'),completedDate:null,technicianName:fv('m-tech'),estimatedCost:fn('m-cost'),actualCost:null,notes:fv('m-notes')};
+    d.id=nextId(S.maintenance);S.maintenance.push(d);
+    const v=S.vehicles.find(x=>x.id===d.vehicleId);
+    if(v&&(d.priority==='critical'||d.priority==='high')) v.status='maintenance';
+    showToast('Maintenance scheduled');
+
+  } else if(modalMode==='driver') {
+    if(!fv('d-name')||!fv('d-lic')){showToast('Please fill required fields','error');return;}
+    const d = {name:fv('d-name'),license:fv('d-lic'),phone:fv('d-phone'),email:fv('d-email'),status:fv('d-status')||'active',vehicleId:fi('d-vehicle'),joinDate:fv('d-join'),trips:0,color:fv('d-color')||'#4f8ef7'};
+    if(editId){const ex=S.drivers.find(x=>x.id===editId);d.trips=ex.trips;Object.assign(ex,d);}
+    else{d.id=nextId(S.drivers);S.drivers.push(d);}
+    if(d.vehicleId){const v=S.vehicles.find(x=>x.id===d.vehicleId);if(v)v.driverId=editId||d.id;}
+    showToast(editId?'Driver updated':'Driver added');
+
+  } else if(modalMode==='costcenter') {
+    if(!fv('cc-name')||!fv('cc-code')){showToast('Please fill required fields','error');return;}
+    const d = {name:fv('cc-name'),code:fv('cc-code'),desc:fv('cc-desc'),budget:fn('cc-budget'),spent:fn('cc-spent'),active:$('cc-active')?.checked!==false};
+    if(editId) Object.assign(S.costCenters.find(x=>x.id===editId),d);
+    else{d.id=nextId(S.costCenters);S.costCenters.push(d);}
+    showToast(editId?'Cost center updated':'Cost center added');
+  }
+
+  save(); closeModal(); render();
+}
+
+// Delete vehicle
+function delVehicle(id) {
+  if(!confirm('Delete this vehicle? This cannot be undone.')) return;
+  S.vehicles = S.vehicles.filter(x=>x.id!==id);
+  S.transfers = S.transfers.filter(x=>x.vehicleId!==id);
+  S.maintenance = S.maintenance.filter(x=>x.vehicleId!==id);
+  save(); render(); showToast('Vehicle deleted');
+}
+
+// ═══════════════════════════════════════════════════════
+// CHARTS (Chart.js)
+// ═══════════════════════════════════════════════════════
+function chartDefaults() {
+  return {
+    plugins:{legend:{display:false},tooltip:{backgroundColor:'#1f2335',titleColor:'#e2e5f3',bodyColor:'#8b92b8',borderColor:'#313757',borderWidth:1,padding:10}},
+    scales:{x:{grid:{color:'#252a3d'},ticks:{color:'#555e84',font:{size:11}}},y:{grid:{color:'#252a3d'},ticks:{color:'#555e84',font:{size:11}}}}
+  };
+}
+
+function initCharts() {
+  if(currentPage==='analytics') {
+    const bySt = {available:0,in_use:0,maintenance:0,out_of_service:0};
+    S.vehicles.forEach(x=>{if(bySt[x.status]!==undefined)bySt[x.status]++;});
+    const byType = {};S.vehicles.forEach(v=>{byType[v.type]=(byType[v.type]||0)+1;});
+    const byFuel = {};S.vehicles.forEach(v=>{byFuel[v.fuel]=(byFuel[v.fuel]||0)+1;});
+
+    const donutOpts = (labels,data,colors)=>({type:'doughnut',data:{labels,datasets:[{data,backgroundColor:colors,borderWidth:2,borderColor:'#12151f',hoverOffset:4}]},options:{plugins:{legend:{display:false},tooltip:{backgroundColor:'#1f2335',titleColor:'#e2e5f3',bodyColor:'#8b92b8',borderColor:'#313757',borderWidth:1}},cutout:'68%',animation:{duration:600}}});
+
+    mkChart('c-status',donutOpts(['Available','In Use','Maintenance','Out of Service'],[bySt.available,bySt.in_use,bySt.maintenance,bySt.out_of_service],['#2ecc71','#4f8ef7','#f39c12','#e74c3c']));
+    mkChart('c-type',donutOpts(Object.keys(byType),Object.values(byType),['#4f8ef7','#9b59b6','#1abc9c','#f39c12']));
+    mkChart('c-fuel',donutOpts(Object.keys(byFuel),Object.values(byFuel),['#4f8ef7','#2ecc71','#9b59b6','#f39c12']));
+
+    const sorted = [...S.vehicles].sort((a,b)=>(b.mileage||0)-(a.mileage||0)).slice(0,8);
+    mkChart('c-mileage',{type:'bar',data:{labels:sorted.map(v=>v.fleet),datasets:[{data:sorted.map(v=>v.mileage||0),backgroundColor:'#4f8ef744',borderColor:'#4f8ef7',borderWidth:2,borderRadius:4}]},options:{...chartDefaults(),plugins:{...chartDefaults().plugins}}});
+
+    const activeCCs = S.costCenters.filter(c=>c.active);
+    mkChart('c-budget',{type:'bar',data:{labels:activeCCs.map(c=>c.code),datasets:[{label:'Budget',data:activeCCs.map(c=>c.budget),backgroundColor:'#4f8ef722',borderColor:'#4f8ef7',borderWidth:2,borderRadius:4},{label:'Spent',data:activeCCs.map(c=>c.spent),backgroundColor:'#2ecc7122',borderColor:'#2ecc71',borderWidth:2,borderRadius:4}]},options:{...chartDefaults(),plugins:{legend:{display:true,labels:{color:'#8b92b8',font:{size:11}}},tooltip:{backgroundColor:'#1f2335',titleColor:'#e2e5f3',bodyColor:'#8b92b8',borderColor:'#313757',borderWidth:1}}}});
+  }
+}
+
+function mkChart(id, cfg) {
+  const el = $(id);
+  if(!el) return;
+  try {
+    const c = new Chart(el, cfg);
+    activeCharts.push(c);
+  } catch(e){}
+}
+
+// ═══════════════════════════════════════════════════════
+// EMPTY STATE
+// ═══════════════════════════════════════════════════════
+function emptyState(title, msg) {
+  return `<div class="empty"><div class="empty-icon"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"/></svg></div><h3>${title}</h3><p>${msg}</p></div>`;
+}
+
+// ═══════════════════════════════════════════════════════
+// INIT
+// ═══════════════════════════════════════════════════════
+document.addEventListener('click', e => {
+  const panel = $('notif-panel');
+  const btn = $('notif-btn');
+  if(panel.classList.contains('open') && !panel.contains(e.target) && !btn.contains(e.target)) {
+    panel.classList.remove('open');
+  }
+});
+
+updateBadges();
+render();
+</script>
+
+
+</body></html>
